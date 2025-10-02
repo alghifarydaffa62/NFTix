@@ -6,7 +6,7 @@ export default function Navbar() {
 
             <ul className="flex gap-10 text-xl font-medium">
                 <li>
-                    <a href="" className="hover:text-blue-800">Home</a>
+                    <a href="/" className="hover:text-blue-800">Home</a>
                 </li>
                 <li>
                     <a href="" className="hover:text-blue-800">About</a>
@@ -15,7 +15,7 @@ export default function Navbar() {
                     <a href="" className="hover:text-blue-800">Features</a>
                 </li>
                 <li>
-                    <a href="" className="hover:text-blue-800">Connect Wallet</a>
+                    <a href="/connect" className="hover:text-blue-800">Connect Wallet</a>
                 </li>
             </ul>
         </nav>

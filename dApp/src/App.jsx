@@ -2,6 +2,8 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Home from './Pages/Home'
 import ConnectPage from './Pages/ConnectPage'
+import BuyerPage from './Pages/BuyerPage'
+import OrganizerPage from './Pages/OrganizerPage'
 
 function App() {
   return (
@@ -10,6 +12,8 @@ function App() {
         <Routes>
           <Route path='/' element={<Home/>}/>
           <Route path='/connect' element={<ConnectPage/>}/>
+          <Route path='/buyer' element={<BuyerPage/>}/>
+          <Route path='/organizer' element={<OrganizerPage/>}/>
         </Routes>
       </Router>
     </div>

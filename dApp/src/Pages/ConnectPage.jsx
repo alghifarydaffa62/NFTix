@@ -1,30 +1,30 @@
-import { useState } from "react"
-import { ethers } from "ethers"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react'
 import buyer from "../assets/Buyer.png"
 import organizer from "../assets/Organizer.png"
 import Navbar from "../Component/Navbar"
 
 export default function ConnectPage() {
-    const [userWallet, SetUserWallet] = useState(null)
+    const { open } = useAppKit()
+    const { address, isConnected } = useAppKitAccount()
     const navigate = useNavigate()
+    const [pendingRole, setPendingRole] = useState(null)
+
+    useEffect(() => {
+        if(isConnected && address && pendingRole) {
+            localStorage.setItem("userWallet", address)
+
+            if(pendingRole == "buyer") navigate('/buyer')
+            if(pendingRole == "organizer") navigate('/organizer')
+
+            setPendingRole(null)
+        }
+    }, [isConnected, address, pendingRole, navigate])
 
     const HandleConnect = async (role) => {
-        try {
-            if(!window.ethereum) throw new Error("Metamask is not installed!")
-
-            const provider = new ethers.BrowserProvider(window.ethereum)
-            const signer = await provider.getSigner()
-            const address = await signer.getAddress()
-
-            SetUserWallet(address);
-            localStorage.setItem("userWallet", address);
-
-            if(role == "buyer") navigate("/buyer")
-            if(role == "organizer") navigate("/organizer")
-        } catch(error) {
-            console.error("Wallet connect failed: ", error);
-        }
+        setPendingRole(role)
+        open()
     }
 
     return(

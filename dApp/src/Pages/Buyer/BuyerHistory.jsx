@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
-import { useAppKitAccount, useDisconnect } from "@reown/appkit/react"
+import { useDisconnect, useAppKitAccount } from "@reown/appkit/react"
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-export default function BuyerPage() {
+export default function BuyerHistory() {
     const { address, isConnected } = useAppKitAccount()
     const { disconnect } = useDisconnect()
     const navigate = useNavigate()
@@ -28,17 +28,6 @@ export default function BuyerPage() {
         navigate("/connect")
     }
 
-    if (isChecking) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading...</p>
-                </div>
-            </div>
-        )
-    }
-
     return(
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar */}
@@ -49,13 +38,13 @@ export default function BuyerPage() {
                     </div>
                     <ul className="p-4 space-y-3">
                         <li>
-                            <a href="/buyer" className="block p-2 rounded bg-blue-800">Event</a>
+                            <a href="/buyer" className="block p-2 rounded hover:bg-blue-800 transition">Events</a>
                         </li>
                         <li>
                             <a href="/buyer/MyEvents" className="block p-2 rounded hover:bg-blue-800 transition">Active Events</a>
                         </li>
                         <li>
-                            <a href="/buyer/history" className="block p-2 rounded hover:bg-blue-800 transition">History</a>
+                            <a href="/buyer/history" className="block p-2 rounded bg-blue-800">History</a>
                         </li>
                     </ul>
                 </div>
@@ -73,8 +62,9 @@ export default function BuyerPage() {
             {/* Main Content */}
             <main className="flex-1 p-8">
                 <h1 className="text-2xl font-bold mb-4 text-center">
-                    Welcome Buyer! {address}
+                    This is your history buying tickets now.
                 </h1>
+
             </main>
         </div>
     )

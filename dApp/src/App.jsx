@@ -6,6 +6,8 @@ import BuyerPage from './Pages/BuyerPage'
 import OrganizerPage from './Pages/OrganizerPage'
 import BuyerEvents from './Pages/Buyer/BuyerEvents'
 import BuyerHistory from './Pages/Buyer/BuyerHistory'
+import CreateEvent from './Pages/Organizer.jsx/CreateEvent'
+import OrganizerEvents from './Pages/Organizer.jsx/OrganizerEvents'
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path='/buyer/MyEvents' element={<BuyerEvents/>}/>
           <Route path='/buyer/history' element={<BuyerHistory/>}/>
           <Route path='/organizer' element={<OrganizerPage/>}/>
+          <Route path='/organizer/create' element={<CreateEvent/>}/>
+          <Route path='/organizer/MyEvents' element={<OrganizerEvents/>}/>
         </Routes>
       </Router>
     </div>

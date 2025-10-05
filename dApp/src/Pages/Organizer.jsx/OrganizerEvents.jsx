@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useDisconnect, useAppKitAccount } from "@reown/appkit/react"
 import { useNavigate } from "react-router-dom";
-import { useAppKitAccount, useDisconnect } from "@reown/appkit/react"
+import { useState, useEffect } from "react";
 
-export default function OrganizerPage() {
+export default function OrganizerEvents() {
     const { address, isConnected } = useAppKitAccount()
     const { disconnect } = useDisconnect()
     const navigate = useNavigate()
@@ -28,17 +28,6 @@ export default function OrganizerPage() {
         navigate("/connect")
     }
 
-    if (isChecking) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading...</p>
-                </div>
-            </div>
-        )
-    }
-
     return(
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar */}
@@ -49,13 +38,13 @@ export default function OrganizerPage() {
                     </div>
                     <ul className="p-4 space-y-3">
                         <li>
-                            <a href="/organizer" className="block p-2 rounded bg-blue-800">Dashboard</a>
+                            <a href="/organizer" className="block p-2 rounded hover:bg-blue-800 transition">Dashboard</a>
                         </li>
                         <li>
                             <a href="/organizer/create" className="block p-2 rounded hover:bg-blue-800 transition">Create Event</a>
                         </li>
                         <li>
-                            <a href="/organizer/MyEvents" className="block p-2 rounded hover:bg-blue-800 transition">MyEvent</a>
+                            <a href="/organizer/MyEvents" className="block p-2 rounded bg-blue-800">MyEvents</a>
                         </li>
                     </ul>
                 </div>
@@ -73,7 +62,7 @@ export default function OrganizerPage() {
             {/* Main Content */}
             <main className="flex-1 p-8">
                 <h1 className="text-2xl font-bold mb-4 text-center">
-                    Welcome organizer! {address}
+                    This is all your events.
                 </h1>
             </main>
         </div>

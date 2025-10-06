@@ -23,21 +23,21 @@ contract EventFactory {
     uint private eventIDCounter;
 
     event EventCreated(
-        uint indexed eventID,
+        uint indexed eventId,
         string indexed eventName, 
         address indexed eventOrganizer, 
         uint date, 
         address ticketContract
     );
-    event EventUpdated(uint indexed eventID, string indexed eventName);
+    event EventUpdated(uint indexed eventId, string indexed eventName);
 
-    modifier onlyOrganizer(uint _eventID) {
-        require(events[_eventID].organizer == msg.sender, "You are not the organizer of this Event!");
+    modifier onlyOrganizer(uint _eventId) {
+        require(events[_eventId].organizer == msg.sender, "You are not the organizer of this Event!");
         _;
     }
 
-    modifier validEventId(uint _eventID) {
-        require(_eventID < events.length, "Invalid eventID!");
+    modifier validEventId(uint _eventId) {
+        require(_eventId < events.length, "Invalid eventID!");
         _;
     }
 
@@ -49,7 +49,7 @@ contract EventFactory {
         string memory _venue,
         uint _maxParticipant,
         uint _deadline
-    ) public returns (uint eventID) {
+    ) public returns (uint eventId) {
         require(bytes(_name).length > 0, "Invalid Event Name!");
         require(bytes(_desc).length > 10, "Event Description must more than 10 chars!");
         require(bytes(_venue).length > 3, "Invalid Event Venue!");
@@ -78,10 +78,10 @@ contract EventFactory {
 
         emit EventCreated(eventIDCounter, _name, msg.sender, _date, address(0));
 
-        eventID = eventIDCounter;
+        eventId = eventIDCounter;
         eventIDCounter++;
 
-        return eventID;
+        return eventId;
     }
 
     function setTicketContract(
@@ -102,19 +102,19 @@ contract EventFactory {
     }
 
     function updateEvent(
-        uint _eventID,
+        uint _eventId,
         string memory _name,
         string memory _desc,
         string memory _imageURI
-    ) public onlyOrganizer(_eventID){
+    ) public onlyOrganizer(_eventId){
         require(bytes(_name).length > 0, "Invalid name update");
         require(bytes(_desc).length > 10, "Invalid description update");
 
-        events[_eventID].name = _name;
-        events[_eventID].desc = _desc;
-        events[_eventID].imageURI = _imageURI;
+        events[_eventId].name = _name;
+        events[_eventId].desc = _desc;
+        events[_eventId].imageURI = _imageURI;
 
-        emit EventUpdated(_eventID, _name);
+        emit EventUpdated(_eventId, _name);
     }
 
     function recordRevenue(uint256 _eventId, uint256 _amount) 
@@ -159,8 +159,8 @@ contract EventFactory {
         return organizerEvents[_organizer];
     }
 
-    function getEvent(uint _eventID) public view returns(Event memory) {
-        return events[_eventID];
+    function getEvent(uint _eventId) public view returns(Event memory) {
+        return events[_eventId];
     }
 
     function getTotalEvent() public view returns(uint) {

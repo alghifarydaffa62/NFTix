@@ -13,6 +13,7 @@
     "@reown/appkit": "^1.8.8",
     "@reown/appkit-adapter-ethers": "^1.8.8",
     "@tailwindcss/vite": "^4.1.14",
+    "dotenv": "^17.2.3",
     "ethers": "^6.15.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

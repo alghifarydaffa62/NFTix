@@ -24,10 +24,10 @@ export default function CreateEventPage() {
     }, [isChecking, isConnected, navigate])
 
     return(
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex max-h-screen bg-gray-100">
             <SidebarOrganizer/>
             {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 p-8 overflow-y-scroll">
                 <h1 className="text-2xl font-bold mb-4 text-center">
                     Create Your Event
                 </h1>

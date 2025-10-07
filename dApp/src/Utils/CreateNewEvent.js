@@ -46,7 +46,7 @@ export default async function CreateNewEvent(
         const provider = new BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
 
-        const contractAddress = ""
+        const contractAddress = "0xDEB53a5484de3B6eacC691D9552f189FeAf98141"
         
         const eventFactory = new Contract(
             contractAddress,

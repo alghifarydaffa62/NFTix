@@ -108,13 +108,6 @@ export default function CreateEvent() {
             {success && (
                 <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                     <strong>Success!</strong> Event created with ID: {eventId}
-                    <br />
-                    <a 
-                        href={`/event/${eventId}`} 
-                        className="underline"
-                    >
-                        View Event
-                    </a>
                 </div>
             )}
 

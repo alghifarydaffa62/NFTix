@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppKitAccount} from "@reown/appkit/react"
 import SidebarOrganizer from "../Component/SidebarOrganizer";
+import fetchOrganizerEvents from "../Utils/fetchOrganizerEvents";
 
 export default function OrganizerPage() {
     const { address, isConnected } = useAppKitAccount()
     const navigate = useNavigate()
     const [isChecking, setIsChecking] = useState(true)
+
+    const [totalEvents, setTotalEvents] = useState(0)
+    const [isLoadingEvents, setIsLoadingEvents] = useState(true)
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -21,6 +25,28 @@ export default function OrganizerPage() {
             navigate("/connect")
         }
     }, [isChecking, isConnected, navigate])
+
+    useEffect(() => {
+        const loadTotalEvents = async () => {
+            try {
+                setIsLoadingEvents(true)
+                const eventIds = await fetchOrganizerEvents(address)
+                setTotalEvents(eventIds.length)
+            } catch(error) {
+                console.error("Failed: ", error)
+                setTotalEvents(0)
+            } finally {
+                setIsLoadingEvents(false)
+            }
+        }
+
+        if (address && isConnected) {
+            loadTotalEvents();
+        } else {
+            setIsLoadingEvents(false);
+            setTotalEvents(0);
+        }
+    }, [address, isConnected])
 
     if (isChecking) {
         return (
@@ -41,6 +67,16 @@ export default function OrganizerPage() {
                 <h1 className="text-2xl font-bold mb-4 text-center">
                     Welcome organizer! {address}
                 </h1>
+
+                <div className="p-5 bg-blue-800 w-fit text-white rounded-md">
+                    <h1>Total Events Created</h1>
+
+                    {isLoadingEvents ? (
+                        <p>Loading total...</p>
+                    ) : (
+                        <p className="text-3xl font-bold">{totalEvents}</p>
+                    )}
+                </div>
             </main>
         </div>
     )

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Component/Sidebar";
+import ShowAllEvents from "../Component/ShowAllEvents";
 
 export default function BuyerPage() {
     const { address, isConnected } = useAppKitAccount()
@@ -41,6 +42,11 @@ export default function BuyerPage() {
                 <h1 className="text-2xl font-bold mb-4 text-center">
                     Welcome Buyer! {address}
                 </h1>
+
+                <h1 className="text-xl font-semibold">All Active Events</h1>
+                <div className="mt-8">
+                    <ShowAllEvents/>
+                </div>
             </main>
         </div>
     )

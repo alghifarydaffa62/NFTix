@@ -2,9 +2,8 @@ import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/Event
 import { Contract, ethers } from "ethers"
 
 export default async function fetchOrganizerEvents(userAddress) {
-
     try {
-        const contractAddress = "0xDEB53a5484de3B6eacC691D9552f189FeAf98141"
+        const contractAddress = "0xDF82389BD2C9Abd2a15C099bd237C63D7C6A0d47"        
         const provider = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
 
@@ -13,39 +12,29 @@ export default async function fetchOrganizerEvents(userAddress) {
             EventFactoryABI.abi,
             signer
         )
+
+        const organizerEvents = await eventFactory.getEventsByOrganizer(userAddress)
+
+        const formattedEvents = organizerEvents.map(event => ({
+            id: event.id.toString(),
+            name: event.name,
+            desc: event.desc,
+            imageURI: event.imageURI,
+            date: Number(event.date),
+            venue: event.venue,
+            organizer: event.organizer,
+            maxParticipants: Number(event.maxParticipant),
+            deadline: Number(event.deadline),
+            totalRevenue: event.totalRevenue.toString(),
+            active: event.active,
+            ticketContract: event.ticketContract
+        }));
+
+        return formattedEvents;
         
-        const organizerEventIds = await eventFactory.getOrganizerEvent(userAddress)
-
-        const eventDetailsPromises = organizerEventIds.map(async (eventId) => {
-            try {
-                const event = eventFactory.getEvent(eventId)
-
-                return {
-                    id: eventId.toString(),
-                    name: event.name,
-                    desc: event.desc,
-                    imageURI: event.imageURI,
-                    date: Number(event.date),
-                    venue: event.venue,
-                    organizer: event.organizer,
-                    maxParticipants: Number(event.maxParticipant),
-                    deadline: Number(event.deadline),
-                    totalRevenue: event.totalRevenue.toString(),
-                    active: event.active,
-                    ticketContract: event.ticketContract
-                }
-            } catch(error) {
-                console.error(`Failed to fetch details for event ID ${eventId}:`, error);
-                return null;
-            }
-        })
-
-        const events = await Promise.all(eventDetailsPromises)
-
-        const validEvents = events.filter(event => event !== null)
-        return validEvents
     } catch (error) {
-        console.error('Failed: ', error)
+        console.error('❌ Error in fetchOrganizerEvents:', error);
+        throw error;
     }
 }
 
@@ -72,10 +61,10 @@ export function formatDate(timestamp) {
 }
 
 export function isEventActive(event) {
-  const now = Math.floor(Date.now() / 1000);
-  return (
-    event.active &&
-    now < event.deadline &&
-    now < event.date
-  );
+    const now = Math.floor(Date.now() / 1000);
+    return (
+        event.active &&
+        now < event.deadline &&
+        now < event.date
+    );
 }

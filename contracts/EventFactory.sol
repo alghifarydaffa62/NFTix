@@ -155,6 +155,18 @@ contract EventFactory {
         return activeEvents;
     }
 
+    function getEventsByOrganizer(address _organizer) public view returns (Event[] memory) {
+        uint[] memory eventIds = organizerEvents[_organizer];
+        Event[] memory organizerEventDetails = new Event[](eventIds.length);
+
+        for (uint i = 0; i < eventIds.length; i++) {
+            uint eventId = eventIds[i];
+            organizerEventDetails[i] = events[eventId];
+        }
+
+        return organizerEventDetails;
+    }
+
     function getOrganizerEvent(address _organizer) public view returns(uint[] memory) {
         return organizerEvents[_organizer];
     }

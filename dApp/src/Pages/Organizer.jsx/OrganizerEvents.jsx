@@ -26,11 +26,11 @@ export default function OrganizerEvents() {
     const userAddress = localStorage.getItem("userWallet")
 
     return(
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex max-h-screen bg-gray-100">
             <SidebarOrganizer/>
 
             {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 overflow-y-scroll p-8">
                 <h1 className="text-2xl font-bold mb-4 text-center">
                     This is all your events.
                 </h1>

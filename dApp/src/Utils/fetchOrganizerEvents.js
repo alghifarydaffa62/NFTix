@@ -39,14 +39,13 @@ export default async function fetchOrganizerEvents(userAddress) {
 }
 
 export function ipfsToHttp(ipfsURI) {
-    if (!ipfsURI) return "";
-  
-    if (ipfsURI.startsWith("ipfs://")) {
-        const hash = ipfsURI.replace("ipfs://", "");
-        return `https://ipfs.io/ipfs/${hash}`;
+    if (!ipfsURI || !ipfsURI.startsWith("ipfs://")) {
+        return ""; 
     }
-    
-    return ipfsURI;
+  
+    const hash = ipfsURI.replace("ipfs://", "");
+
+    return `https://rose-blank-vicuna-66.mypinata.cloud/ipfs/${hash}`;
 }
 
 export function formatDate(timestamp) {

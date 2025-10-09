@@ -1,7 +1,6 @@
-import { isEventActive, ipfsToHttp, formatDate } from "../Utils/fetchOrganizerEvents";
+import { ipfsToHttp, formatDate } from "../Utils/fetchOrganizerEvents";
 
 export default function EventCard({ event }) {
-  const active = isEventActive(event);
   const imageUrl = ipfsToHttp(event.imageURI);
 
   const hasTicketContract = event.ticketContract !== "0x0000000000000000000000000000000000000000";

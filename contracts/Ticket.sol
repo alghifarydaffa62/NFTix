@@ -4,8 +4,10 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
+    using Strings for uint256;
 
     struct TicketTier {
         string name;
@@ -24,6 +26,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     }
 
     uint256 private _tokenIdCounter;
+    uint256 public eventId; 
 
     address public factory;
     uint256 public immutable maxPerWallet;
@@ -44,7 +47,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     bool public saleActive = true;
     bool public eventEnded = false;
 
-    // Events
     event TicketsPurchased(address indexed buyer, uint[] tokenIds, uint tierIndex, uint quantity);
     event TicketUsed(uint indexed tokenId, address indexed user, uint timestamp);
     event TicketBurned(uint indexed tokenId);
@@ -54,7 +56,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     event Withdrawn(address indexed to, uint256 amount);
 
     modifier onlyFactory() {
-        require(msg.sender == factory, "TicketNFT: only factory");
+        require(msg.sender == factory, "only factory");
         _;
     }
 
@@ -64,10 +66,11 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     }
 
     constructor(
+        address _factory,
+        uint _eventId,
         string memory _name,
         string memory _symbol,
         uint256 _maxPerWallet,
-        address _factory,
         string memory _eventTitle,
         string memory _eventInfo,
         string memory _eventVenue,
@@ -79,35 +82,43 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         require(_maxPerWallet > 0, "Max Per Wallet should be more than 0");
 
         factory = _factory;
+        eventId = _eventId;
         maxPerWallet = _maxPerWallet;
         eventTitle = _eventTitle;
         eventVenue = _eventVenue;
         eventDate = _eventDate;
         eventInfo = _eventInfo;
-        lockPeriod = _lockPeriodSeconds == 0 ? 172800 : _lockPeriodSeconds; // 48h default
+        lockPeriod = _lockPeriodSeconds == 0 ? 172800 : _lockPeriodSeconds;
 
         for (uint i = 0; i < _tiers.length; i++) {
             tiers.push(_tiers[i]);
         }
     }
 
-    function buyTicket(uint tierIndex, uint quantity) external payable nonReentrant whenSaleActive returns(uint[] memory) {
+    function buyTicket(uint tierIndex, uint quantity) 
+        external 
+        payable 
+        nonReentrant 
+        whenSaleActive 
+        returns(uint[] memory) 
+    {
         require(quantity <= maxPerWallet, "Exceed ticket buy limit");
-        require(tierIndex >= tiers.length, "Invalid tier");
+        require(tierIndex <= tiers.length, "Invalid tier");
+        require(block.timestamp < eventDate, "Event closed");
 
         TicketTier storage tier = tiers[tierIndex];
+        require(tier.sold + quantity <= tier.maxSupply, "Tier sold out");
 
         uint totalPrice = tier.price * quantity;
         require(msg.value == totalPrice, "Invalid payment amount");
 
-        uint memory newTokenIds = new uint[](quantity);
+        uint[] memory newTokenIds = new uint[](quantity);
 
         for (uint i = 0; i < quantity; i++) {
             uint256 tokenId = _tokenIdCounter++;
             
             _safeMint(msg.sender, tokenId);
-            
-            // Generate seat number
+
             string memory seatNumber = _generateSeatNumber(tier.name, tier.sold + i + 1);
             
             tickets[tokenId] = Ticket({
@@ -137,40 +148,62 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         return newTokenIds;
     }
 
-    // function markAsUsed(uint tokenId) external onlyOwner {
-    //     _requireOwned(tokenId);
-
-    //     Ticket storage
-    // }
-
-    function mintTo(address to, string calldata uri) external onlyFactory returns (uint256) {
-        require(to != address(0), "Invalid target address");
-        require(purchasedCount[to] + 1 <= maxPerWallet, "Exceeds max per wallet");
-
-        _tokenIdCounter.increment();
-        uint256 newId = _tokenIdCounter.current();
-
-        _safeMint(to, newId);
-
-        _tokenURIs[newId] = uri;
-
-        purchaseTimestamp[newId] = block.timestamp;
-
-        purchasedCount[to] += 1;
-
-        emit TicketMinted(to, newId, uri);
-        return newId;
+    function markAsUsed(uint256 tokenId) external onlyOwner {
+        _requireOwned(tokenId);
+        
+        Ticket storage ticket = tickets[tokenId];
+        
+        require(!ticket.used, "Ticket already used");
+        require(block.timestamp == eventDate, "Not event day!");
+        ticket.used = true;
+        
+        emit TicketUsed(tokenId, ownerOf(tokenId), block.timestamp);
     }
 
-    function totalSupply() public view returns (uint256) {
-        return _tokenIdCounter.current();
+    function verifyTicket(uint tokenId) 
+        external 
+        view 
+        returns(
+            bool isValid, 
+            address currentOwner, 
+            string memory tier, 
+            string memory seat, 
+            bool used, 
+            string memory reason
+    ) {
+        try this.ownerOf(tokenId) returns (address owner) {
+            currentOwner = owner;
+            Ticket memory ticket = tickets[tokenId];
+
+            if (ticket.used) {
+                return(false, currentOwner, ticket.tier, ticket.seatNumber, true, "Already used");
+            } 
+
+            if (block.timestamp < eventDate - 1 days) {
+                return (false, currentOwner, ticket.tier, ticket.seatNumber, false, "Too early - not event day");
+            }
+            
+            if (block.timestamp > eventDate + 2 days) {
+                return (false, currentOwner, ticket.tier, ticket.seatNumber, false, "Event already ended");
+            }
+
+            return (true, currentOwner, ticket.tier, ticket.seatNumber, false, "Valid");
+        } catch {
+            return (false, address(0), "", "", false, "Token does not exist");
+        }
     }
 
-    function setFactory(address newFactory) external onlyOwner {
-        require(newFactory != address(0), "Invalid factory");
-        address old = factory;
-        factory = newFactory;
-        emit FactoryChanged(old, newFactory);
+    function setTokenURI(uint tokenId, string calldata uri) external {
+        require(msg.sender == ownerOf(tokenId), "Not Authorized!");
+        _tokenURIs[tokenId] = uri;
+    }
+
+    function setTokenURIBatch(uint[] calldata tokenIds, string[] calldata uris) external onlyOwner {
+        require(tokenIds.length == uris.length, "Length mismatch");
+        
+        for (uint i = 0; i < tokenIds.length; i++) {
+            _tokenURIs[tokenIds[i]] = uris[i];
+        }
     }
 
     function setLockPeriod(uint256 newLockPeriod) external onlyOwner {
@@ -178,74 +211,197 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         lockPeriod = newLockPeriod;
     }
 
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "Nonexistent token");
-        string memory uri = _tokenURIs[tokenId];
-        return uri;
+    function setFactory(address newFactory) external onlyOwner {
+        require(newFactory != address(0), "Invalid factory address!");
+        address old = factory;
+        factory = newFactory;
+        emit FactoryChanged(old, newFactory);
+    }
+
+    function endEvent() external onlyOwner {
+        eventEnded = true;
+    }
+
+    function withdraw() external onlyOwner nonReentrant {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No funds");
+        
+        (bool success, ) = payable(owner()).call{value: balance}("");
+        require(success, "Transfer failed");
+        
+        emit Withdrawn(owner(), balance);
+    }
+
+    function withdrawTo(address payable recipient) external onlyOwner nonReentrant {
+        require(recipient != address(0), "Invalid address");
+        
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No funds");
+        
+        (bool success, ) = recipient.call{value: balance}("");
+        require(success, "Transfer failed");
+        
+        emit Withdrawn(recipient, balance);
+    }
+
+    function burn(uint256 tokenId) external onlyOwner {
+        address tokenOwner = ownerOf(tokenId);
+        
+        _burn(tokenId);
+        
+        if (purchasedCount[tokenOwner] > 0) {
+            unchecked {
+                purchasedCount[tokenOwner]--;
+            }
+        }
+        
+        delete purchaseTimestamp[tokenId];
+        delete _tokenURIs[tokenId];
+        delete tickets[tokenId];
+        
+        emit TicketBurned(tokenId);
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return _tokenIdCounter;
+    }
+
+    function maxSupply() public view returns (uint256) {
+        uint256 total = 0;
+        for (uint i = 0; i < tiers.length; i++) {
+            total += tiers[i].maxSupply;
+        }
+        return total;
+    }
+
+    function getTier(uint256 tierIndex) external view returns (TicketTier memory) {
+        require(tierIndex < tiers.length, "Invalid tier");
+        return tiers[tierIndex];
+    }
+
+    function getAllTiers() external view returns (TicketTier[] memory) {
+        return tiers;
     }
 
     function isLocked(uint256 tokenId) public view returns (bool) {
-        require(_exists(tokenId), "Nonexistent token");
+        _requireOwned(tokenId);
         uint256 ts = purchaseTimestamp[tokenId];
         if (ts == 0) return false;
         return block.timestamp < (ts + lockPeriod);
     }
 
     function remainingLockSeconds(uint256 tokenId) external view returns (uint256) {
-        require(_exists(tokenId), "Nonexistent token");
+        _requireOwned(tokenId);
         uint256 ts = purchaseTimestamp[tokenId];
         if (ts == 0) return 0;
+        
         uint256 unlockAt = ts + lockPeriod;
         if (block.timestamp >= unlockAt) return 0;
+        
         return unlockAt - block.timestamp;
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override virtual {
-        super._beforeTokenTransfer(from, to, tokenId);
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireOwned(tokenId);
+        
+        string memory uri = _tokenURIs[tokenId];
 
-        if (from != address(0) && to != address(0)) {
-            uint256 ts = purchaseTimestamp[tokenId];
-            if (ts != 0) {
-                require(block.timestamp >= ts + lockPeriod, "TicketNFT: token locked");
+        if (bytes(uri).length > 0) {
+            return uri;
+        }
+
+        return string(abi.encodePacked("ipfs://", tokenId.toString()));
+    }
+
+    function tokensOfOwner(address owner) external view returns (uint256[] memory) {
+        uint256 balance = balanceOf(owner);
+        uint256[] memory tokens = new uint256[](balance);
+        uint256 index = 0;
+        
+        for (uint256 i = 0; i < _tokenIdCounter && index < balance; i++) {
+            try this.ownerOf(i) returns (address tokenOwner) {
+                if (tokenOwner == owner) {
+                    tokens[index++] = i;
+                }
+            } catch {
+                continue;
             }
         }
+        
+        return tokens;
     }
 
-    function burn(uint256 tokenId) external onlyOwner {
-        address ownerOfToken = ownerOf(tokenId);
-        _burn(tokenId);
+    function _update(address to, uint256 tokenId, address auth) 
+        internal 
+        override 
+        returns (address) 
+    {
+        address from = _ownerOf(tokenId);
 
-        if (purchasedCount[ownerOfToken] > 0) {
-            purchasedCount[ownerOfToken] -= 1;
+        if (from != address(0) && to != address(0)) {
+            require(!isLocked(tokenId), "Token locked!");
         }
-
-        if (purchaseTimestamp[tokenId] != 0) {
-            purchaseTimestamp[tokenId] = 0;
-        }
-        if (bytes(_tokenURIs[tokenId]).length != 0) {
-            delete _tokenURIs[tokenId];
-        }
+        
+        return super._update(to, tokenId, auth);
     }
 
 
-    function getEventInfo() external view returns (
-        string memory _title,
-        string memory _info,
-        uint256 _maxSupply,
-        uint256 _sold,
-        uint256 _maxPerWalletLocal,
-        uint256 _lockPeriod
-    ) {
-        _title = eventTitle;
-        _info = eventInfo;
-        _maxSupply = maxSupply;
-        _sold = totalSupply();
-        _maxPerWalletLocal = maxPerWallet;
-        _lockPeriod = lockPeriod;
+    function _recordRevenue(uint256 amount) internal {
+        (bool success, ) = factory.call(
+            abi.encodeWithSignature("recordRevenue(uint256,uint256)", eventId, amount)
+        );
+        require(success, "Revenue record failed");
+    }
+    
+    function _generateSeatNumber(string memory tierName, uint256 seatIndex) 
+        internal 
+        pure 
+        returns (string memory) 
+    {
+        string memory prefix = _getTierPrefix(tierName);
+        return string(abi.encodePacked(
+            prefix,
+            "-",
+            _padNumber(seatIndex, 3)
+        ));
     }
 
+    function _getTierPrefix(string memory tierName) internal pure returns (string memory) {
+        bytes memory nameBytes = bytes(tierName);
+        if (nameBytes.length <= 4) return tierName;
+        
+        bytes memory prefix = new bytes(4);
+        for (uint i = 0; i < 4; i++) {
+            prefix[i] = nameBytes[i];
+        }
+        return string(prefix);
+    }
+
+    function _padNumber(uint256 number, uint256 digits) internal pure returns (string memory) {
+        string memory numStr = number.toString();
+        bytes memory numBytes = bytes(numStr);
+        
+        if (numBytes.length >= digits) return numStr;
+        
+        bytes memory padded = new bytes(digits);
+        uint256 padding = digits - numBytes.length;
+
+        for (uint i = 0; i < padding; i++) {
+            padded[i] = "0";
+        }
+
+        for (uint i = 0; i < numBytes.length; i++) {
+            padded[padding + i] = numBytes[i];
+        }
+        
+        return string(padded);
+    }
+    
     receive() external payable {
-        revert("TicketNFT: no direct payments");
+        revert("Use buyTicket function");
     }
 
+    fallback() external payable {
+        revert("Use buyTicket function");
+    }
 }

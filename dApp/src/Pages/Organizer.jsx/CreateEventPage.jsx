@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SidebarOrganizer from "../../Component/SidebarOrganizer";
 import CreateEvent from "../../Component/CreateEvent";
+import CreateTicket from "../../Component/CreateTicket";
 
 export default function CreateEventPage() {
     const { isConnected } = useAppKitAccount()
@@ -33,6 +34,10 @@ export default function CreateEventPage() {
                 </h1>
 
                 <CreateEvent/>
+
+                <div className="mt-4">
+                    <CreateTicket/>
+                </div>
             </main>
         </div>
     )

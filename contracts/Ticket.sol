@@ -3,66 +3,148 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract TicketNFT is ERC721, Ownable {
+contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
+
+    struct TicketTier {
+        string name;
+        uint price;
+        uint maxSupply;
+        uint sold;
+    }
+
+    struct Ticket {
+        uint id;
+        string tier;
+        uint originalPrice;
+        string seatNumber;
+        bool used;
+        uint purchaseTimestamp;
+    }
+
     uint256 private _tokenIdCounter;
 
     address public factory;
-
-    uint256 public immutable maxSupply;
-
     uint256 public immutable maxPerWallet;
-
     uint256 public lockPeriod;
+    uint public eventDate;
 
+    TicketTier[] public tiers;
+
+    mapping(uint256 => Ticket) public tickets;
     mapping(uint256 => uint256) public purchaseTimestamp;
-
     mapping(address => uint256) public purchasedCount;
-
     mapping(uint256 => string) private _tokenURIs;
 
     string public eventTitle;
     string public eventInfo;
+    string public eventVenue;
+
+    bool public saleActive = true;
+    bool public eventEnded = false;
 
     // Events
-    event TicketMinted(address indexed to, uint256 indexed tokenId, string tokenURI);
+    event TicketsPurchased(address indexed buyer, uint[] tokenIds, uint tierIndex, uint quantity);
+    event TicketUsed(uint indexed tokenId, address indexed user, uint timestamp);
+    event TicketBurned(uint indexed tokenId);
     event FactoryChanged(address indexed oldFactory, address indexed newFactory);
     event LockPeriodChanged(uint256 oldPeriod, uint256 newPeriod);
+    event SaleStatusChanged(bool active);
+    event Withdrawn(address indexed to, uint256 amount);
 
     modifier onlyFactory() {
         require(msg.sender == factory, "TicketNFT: only factory");
         _;
     }
 
+    modifier whenSaleActive() {
+        require(saleActive, "sale not active!");
+        _;
+    }
+
     constructor(
         string memory _name,
         string memory _symbol,
-        uint256 _maxSupply,
         uint256 _maxPerWallet,
         address _factory,
         string memory _eventTitle,
         string memory _eventInfo,
-        uint256 _lockPeriodSeconds
-    ) ERC721(_name, _symbol) {
+        string memory _eventVenue,
+        uint256 _eventDate,
+        uint256 _lockPeriodSeconds,
+        TicketTier[] memory _tiers
+    ) ERC721(_name, _symbol) Ownable(msg.sender) {
         require(_factory != address(0), "factory required");
-        require(_maxSupply > 0, "Max Supply should be more than 0");
         require(_maxPerWallet > 0, "Max Per Wallet should be more than 0");
 
         factory = _factory;
-        maxSupply = _maxSupply;
         maxPerWallet = _maxPerWallet;
         eventTitle = _eventTitle;
+        eventVenue = _eventVenue;
+        eventDate = _eventDate;
         eventInfo = _eventInfo;
-        if (_lockPeriodSeconds == 0) {
-            lockPeriod = 172800; // 48 hours
-        } else {
-            lockPeriod = _lockPeriodSeconds;
+        lockPeriod = _lockPeriodSeconds == 0 ? 172800 : _lockPeriodSeconds; // 48h default
+
+        for (uint i = 0; i < _tiers.length; i++) {
+            tiers.push(_tiers[i]);
         }
     }
 
+    function buyTicket(uint tierIndex, uint quantity) external payable nonReentrant whenSaleActive returns(uint[] memory) {
+        require(quantity <= maxPerWallet, "Exceed ticket buy limit");
+        require(tierIndex >= tiers.length, "Invalid tier");
+
+        TicketTier storage tier = tiers[tierIndex];
+
+        uint totalPrice = tier.price * quantity;
+        require(msg.value == totalPrice, "Invalid payment amount");
+
+        uint memory newTokenIds = new uint[](quantity);
+
+        for (uint i = 0; i < quantity; i++) {
+            uint256 tokenId = _tokenIdCounter++;
+            
+            _safeMint(msg.sender, tokenId);
+            
+            // Generate seat number
+            string memory seatNumber = _generateSeatNumber(tier.name, tier.sold + i + 1);
+            
+            tickets[tokenId] = Ticket({
+                id: tokenId,
+                tier: tier.name,
+                originalPrice: tier.price,
+                seatNumber: seatNumber,
+                used: false,
+                purchaseTimestamp: block.timestamp
+            });
+            
+            purchaseTimestamp[tokenId] = block.timestamp;
+            newTokenIds[i] = tokenId;
+        }
+
+        unchecked {
+            purchasedCount[msg.sender] += quantity;
+            tier.sold += quantity;
+        }
+
+        if (msg.value > totalPrice) {
+            (bool success, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+            require(success, "Refund failed");
+        }
+        
+        emit TicketsPurchased(msg.sender, newTokenIds, tierIndex, quantity);
+        return newTokenIds;
+    }
+
+    // function markAsUsed(uint tokenId) external onlyOwner {
+    //     _requireOwned(tokenId);
+
+    //     Ticket storage
+    // }
+
     function mintTo(address to, string calldata uri) external onlyFactory returns (uint256) {
         require(to != address(0), "Invalid target address");
-        require(totalSupply() + 1 <= maxSupply, "Max supply reached");
         require(purchasedCount[to] + 1 <= maxPerWallet, "Exceeds max per wallet");
 
         _tokenIdCounter.increment();

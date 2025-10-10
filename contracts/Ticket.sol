@@ -20,7 +20,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         uint id;
         string tier;
         uint originalPrice;
-        string seatNumber;
         bool used;
         uint purchaseTimestamp;
     }
@@ -29,7 +28,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     uint256 public eventId; 
 
     address public factory;
-    uint256 public immutable maxPerWallet;
+    uint256 public immutable maxPerWallet = 3;
     uint256 public lockPeriod;
     uint public eventDate;
 
@@ -102,8 +101,8 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         whenSaleActive 
         returns(uint[] memory) 
     {
-        require(quantity <= maxPerWallet, "Exceed ticket buy limit");
-        require(tierIndex <= tiers.length, "Invalid tier");
+        require(purchasedCount[msg.sender] + quantity <= maxPerWallet, "Exceed ticket buy limit");
+        require(tierIndex < tiers.length, "Invalid tier");
         require(block.timestamp < eventDate, "Event closed");
 
         TicketTier storage tier = tiers[tierIndex];
@@ -118,14 +117,11 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             uint256 tokenId = _tokenIdCounter++;
             
             _safeMint(msg.sender, tokenId);
-
-            string memory seatNumber = _generateSeatNumber(tier.name, tier.sold + i + 1);
             
             tickets[tokenId] = Ticket({
                 id: tokenId,
                 tier: tier.name,
                 originalPrice: tier.price,
-                seatNumber: seatNumber,
                 used: false,
                 purchaseTimestamp: block.timestamp
             });
@@ -167,7 +163,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             bool isValid, 
             address currentOwner, 
             string memory tier, 
-            string memory seat, 
             bool used, 
             string memory reason
     ) {
@@ -176,20 +171,20 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             Ticket memory ticket = tickets[tokenId];
 
             if (ticket.used) {
-                return(false, currentOwner, ticket.tier, ticket.seatNumber, true, "Already used");
+                return(false, currentOwner, ticket.tier, true, "Already used");
             } 
 
             if (block.timestamp < eventDate - 1 days) {
-                return (false, currentOwner, ticket.tier, ticket.seatNumber, false, "Too early - not event day");
+                return (false, currentOwner, ticket.tier, false, "Too early - not event day");
             }
             
             if (block.timestamp > eventDate + 2 days) {
-                return (false, currentOwner, ticket.tier, ticket.seatNumber, false, "Event already ended");
+                return (false, currentOwner, ticket.tier, false, "Event already ended");
             }
 
-            return (true, currentOwner, ticket.tier, ticket.seatNumber, false, "Valid");
+            return (true, currentOwner, ticket.tier, false, "Valid");
         } catch {
-            return (false, address(0), "", "", false, "Token does not exist");
+            return (false, address(0), "", false, "Token does not exist");
         }
     }
 
@@ -352,19 +347,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         );
         require(success, "Revenue record failed");
     }
-    
-    function _generateSeatNumber(string memory tierName, uint256 seatIndex) 
-        internal 
-        pure 
-        returns (string memory) 
-    {
-        string memory prefix = _getTierPrefix(tierName);
-        return string(abi.encodePacked(
-            prefix,
-            "-",
-            _padNumber(seatIndex, 3)
-        ));
-    }
 
     function _getTierPrefix(string memory tierName) internal pure returns (string memory) {
         bytes memory nameBytes = bytes(tierName);
@@ -375,26 +357,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             prefix[i] = nameBytes[i];
         }
         return string(prefix);
-    }
-
-    function _padNumber(uint256 number, uint256 digits) internal pure returns (string memory) {
-        string memory numStr = number.toString();
-        bytes memory numBytes = bytes(numStr);
-        
-        if (numBytes.length >= digits) return numStr;
-        
-        bytes memory padded = new bytes(digits);
-        uint256 padding = digits - numBytes.length;
-
-        for (uint i = 0; i < padding; i++) {
-            padded[i] = "0";
-        }
-
-        for (uint i = 0; i < numBytes.length; i++) {
-            padded[padding + i] = numBytes[i];
-        }
-        
-        return string(padded);
     }
     
     receive() external payable {

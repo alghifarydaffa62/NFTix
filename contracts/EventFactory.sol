@@ -184,18 +184,6 @@ contract EventFactory {
         return organizerEventDetails;
     }
 
-    function getOrganizerEvent(address _organizer) public view returns(uint[] memory) {
-        return organizerEvents[_organizer];
-    }
-
-    function getEvent(uint _eventId) public view returns(Event memory) {
-        return events[_eventId];
-    }
-
-    function getTotalEvent() public view returns(uint) {
-        return events.length;
-    }
-
     function isEventActive(uint256 _eventId) 
         public 
         view 

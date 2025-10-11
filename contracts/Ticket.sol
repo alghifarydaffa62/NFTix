@@ -28,7 +28,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     uint256 public eventId; 
 
     address public factory;
-    uint256 public immutable maxPerWallet = 3;
+    uint256 public immutable maxPerWallet;
     uint256 public lockPeriod;
     uint public eventDate;
 
@@ -135,10 +135,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             tier.sold += quantity;
         }
 
-        if (msg.value > totalPrice) {
-            (bool success, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
-            require(success, "Refund failed");
-        }
+        _recordRevenue(totalPrice);
         
         emit TicketsPurchased(msg.sender, newTokenIds, tierIndex, quantity);
         return newTokenIds;

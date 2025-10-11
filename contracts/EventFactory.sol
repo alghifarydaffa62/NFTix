@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
-
+import "./Ticket.sol";
 contract EventFactory {
     struct Event {
         uint id;
@@ -48,7 +48,8 @@ contract EventFactory {
         uint _date,
         string memory _venue,
         uint _maxParticipant,
-        uint _deadline
+        uint _deadline,
+        TicketNFT.TicketTier[] memory _tiers
     ) public returns (uint eventId) {
         require(bytes(_name).length > 0, "Invalid Event Name!");
         require(bytes(_desc).length > 10, "Event Description must more than 10 chars!");
@@ -56,6 +57,22 @@ contract EventFactory {
         require(_date > block.timestamp, "Invalid Event date!");
         require(_maxParticipant > 0, "Invalid max participant!");
         require(_deadline < _date, "Invalid Event deadline");
+
+        TicketNFT newTicketContract = new TicketNFT(
+            address(this),
+            eventIDCounter,
+            string.concat('Ticket ', _name),
+            'NFTIX',
+            3,
+            _name,
+            _desc,
+            _venue,
+            _date,
+            172800,
+            _tiers
+        );
+
+        address _ticketContract = address(newTicketContract);
 
         Event memory newEvent = Event({
             id: eventIDCounter,
@@ -69,14 +86,14 @@ contract EventFactory {
             deadline: _deadline,
             totalRevenue: 0,
             active: true,
-            ticketContract: address(0)
+            ticketContract: address(newTicketContract)
         });
 
         events.push(newEvent);
 
         organizerEvents[msg.sender].push(eventIDCounter);
 
-        emit EventCreated(eventIDCounter, _name, msg.sender, _date, address(0));
+        emit EventCreated(eventIDCounter, _name, msg.sender, _date, _ticketContract);
 
         eventId = eventIDCounter;
         eventIDCounter++;

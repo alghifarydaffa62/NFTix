@@ -3,7 +3,7 @@ import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/Event
 
 export default async function fetchAllEvents() {
     try {
-        const contractAddress = "0xDF82389BD2C9Abd2a15C099bd237C63D7C6A0d47"
+        const contractAddress = import.meta.env.VITE_EVENTFACTORY
         const provider = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
 

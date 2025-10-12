@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, parseUnits } from "ethers"
+import { BrowserProvider, Contract } from "ethers"
 import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
 import uploadToIPFS from "./uploadToIPFS"
 
@@ -21,7 +21,7 @@ export default async function CreateNewEvent(
         const provider = new BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
 
-        const contractAddress = "0xDF82389BD2C9Abd2a15C099bd237C63D7C6A0d47"
+        const contractAddress = import.meta.env.VITE_EVENTFACTORY
         
         const eventFactory = new Contract(
             contractAddress,

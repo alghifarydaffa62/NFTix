@@ -34,10 +34,6 @@ export default function CreateEventPage() {
                 </h1>
 
                 <CreateEvent/>
-
-                <div className="mt-4">
-                    <CreateTicket/>
-                </div>
             </main>
         </div>
     )

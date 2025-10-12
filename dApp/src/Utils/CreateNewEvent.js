@@ -94,10 +94,6 @@ export default async function CreateNewEvent(eventData) {
                 if (parsed && parsed.name === 'EventCreated') {
                     eventId = parsed.args[0] 
                     ticketContract = parsed.args[4]  
-                    
-                    console.log("✅ Event created successfully!")
-                    console.log("   Event ID:", eventId.toString())
-                    console.log("   Ticket Contract:", ticketContract)
                     break
                 }
             } catch (parseError) {
@@ -106,9 +102,6 @@ export default async function CreateNewEvent(eventData) {
         }
 
         if (!eventId) {
-            console.warn("⚠️ Could not parse EventCreated from logs")
-            console.log("   Fetching event ID from contract state...")
-            
             try {
                 const allEvents = await eventFactory.getAllEvents()
                 const latestEvent = allEvents[allEvents.length - 1]
@@ -132,8 +125,6 @@ export default async function CreateNewEvent(eventData) {
         }
 
     } catch(error) {
-        console.error("Event creating failed!: ", error)
-
         let errorMessage = error.message
 
         return {

@@ -5,9 +5,7 @@ import "@nomicfoundation/hardhat-ignition"
 export default buildModule("NFTIXModule", (m) => {
   const ticketNFT = m.contract("TicketNFT");
 
-  const eventFactory = m.contract("EventFactory", {
-    args: [ticketNFT],
-  });
+  const eventFactory = m.contract("EventFactory", [ticketNFT]);
 
   return { ticketNFT, eventFactory }
 });

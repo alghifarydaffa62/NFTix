@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
-import "./Ticket.sol";
+import "./TicketNFT.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract EventFactory {
@@ -19,10 +19,20 @@ contract EventFactory {
         address ticketContract;
     }
 
+    struct CreateEventParams {
+        string name;
+        string desc;
+        string imageURI;
+        uint date;
+        string venue;
+        uint maxParticipant;
+        uint deadline;
+        TicketNFT.TicketTier[] tiers;
+    }
+
     address public immutable ticketImplementation;
     Event[] public events;
     mapping(address => uint[]) public organizerEvents;
-
     uint private eventIDCounter;
 
     event EventCreated(
@@ -49,47 +59,49 @@ contract EventFactory {
     }
 
     function createEvent(
-        string memory _name,
-        string memory _desc,
-        string memory _imageURI,
-        uint _date,
-        string memory _venue,
-        uint _maxParticipant,
-        uint _deadline,
-        TicketNFT.TicketTier[] memory _tiers
+        CreateEventParams calldata params
     ) public returns (uint eventId) {
-        require(bytes(_name).length > 0, "Invalid Event Name!");
-        require(bytes(_desc).length > 10, "Event Description must more than 10 chars!");
-        require(bytes(_venue).length > 3, "Invalid Event Venue!");
-        require(_date > block.timestamp, "Invalid Event date!");
-        require(_maxParticipant > 0, "Invalid max participant!");
-        require(_deadline < _date, "Invalid Event deadline");
+        require(bytes(params.name).length > 0, "Invalid Event Name!");
+        require(bytes(params.desc).length > 10, "Event Description must more than 10 chars!");
+        require(bytes(params.venue).length > 3, "Invalid Event Venue!");
+        require(params.date > block.timestamp, "Invalid Event date!");
+        require(params.maxParticipant > 0, "Invalid max participant!");
+        require(params.deadline < params.date, "Invalid Event deadline");
 
         address cloneAddress = Clones.clone(ticketImplementation);
 
         TicketNFT newTicketContract = TicketNFT(cloneAddress);
-        newTicketContract.initialize(msg.sender, address(this), eventIDCounter, 3, _name, _desc, _venue, _date, 172800, _tiers);
+
+        newTicketContract.initialize(
+            msg.sender,
+            address(this),
+            eventIDCounter,
+            params.name,
+            params.desc,
+            params.venue,
+            params.date
+        );
+
+        newTicketContract.addTiers(params.tiers);
 
         Event memory newEvent = Event({
             id: eventIDCounter,
-            name: _name,
-            desc: _desc,
-            imageURI: _imageURI,
-            date: _date,
-            venue: _venue,
+            name: params.name,
+            desc: params.desc,
+            imageURI: params.imageURI,
+            date: params.date,
+            venue: params.venue,
             organizer: msg.sender,
-            maxParticipant: _maxParticipant,
-            deadline: _deadline,
+            maxParticipant: params.maxParticipant,
+            deadline: params.deadline,
             totalRevenue: 0,
             active: true,
             ticketContract: cloneAddress
         });
 
         events.push(newEvent);
-
         organizerEvents[msg.sender].push(eventIDCounter);
-
-        emit EventCreated(eventIDCounter, _name, msg.sender, _date, cloneAddress);
+        emit EventCreated(eventIDCounter, params.name, msg.sender, params.date, cloneAddress);
 
         eventId = eventIDCounter;
         eventIDCounter++;
@@ -142,7 +154,6 @@ contract EventFactory {
         events[_eventId].totalRevenue += _amount;
     }
 
-    // GETTER FUNCTION
     function getAllEvents() public view returns(Event[] memory) {
         return events;
     }
@@ -188,7 +199,7 @@ contract EventFactory {
     {
         Event memory eventData = events[_eventId];
         return eventData.active && 
-               block.timestamp < eventData.deadline &&
-               block.timestamp < eventData.date;
+                block.timestamp < eventData.deadline &&
+                block.timestamp < eventData.date;
     }
 }

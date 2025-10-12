@@ -28,7 +28,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     uint256 public eventId; 
 
     address public factory;
-    uint256 public immutable maxPerWallet;
+    uint256 public maxPerWallet;
     uint256 public lockPeriod;
     uint public eventDate;
 
@@ -64,11 +64,12 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         _;
     }
 
-    constructor(
+    constructor() ERC721("NFTix Ticket", "NFTIX") Ownable(address(0)) {}
+
+    function initialize(
+        address _organizer,
         address _factory,
         uint _eventId,
-        string memory _name,
-        string memory _symbol,
         uint256 _maxPerWallet,
         string memory _eventTitle,
         string memory _eventInfo,
@@ -76,7 +77,10 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         uint256 _eventDate,
         uint256 _lockPeriodSeconds,
         TicketTier[] memory _tiers
-    ) ERC721(_name, _symbol) Ownable(msg.sender) {
+    ) external {
+        require(owner() == address(0), "Already initialized");
+        _transferOwnership(_organizer);
+
         require(_factory != address(0), "factory required");
         require(_maxPerWallet > 0, "Max Per Wallet should be more than 0");
 
@@ -354,13 +358,5 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             prefix[i] = nameBytes[i];
         }
         return string(prefix);
-    }
-    
-    receive() external payable {
-        revert("Use buyTicket function");
-    }
-
-    fallback() external payable {
-        revert("Use buyTicket function");
     }
 }

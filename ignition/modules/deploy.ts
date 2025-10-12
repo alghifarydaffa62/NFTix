@@ -1,7 +1,11 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-export default buildModule("EventFactoryModule", (m) => {
-  const eventFactory = m.contract("EventFactory");
+export default buildModule("NFTIXModule", (m) => {
+  const ticketNFT = m.contract("TicketNFT");
 
-  return { eventFactory }
+  const eventFactory = m.contract("EventFactory", {
+    args: [ticketNFT],
+  });
+
+  return { ticketNFT, eventFactory }
 });

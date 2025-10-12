@@ -9,6 +9,9 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     using Strings for uint256;
 
+    uint256 public constant MAX_PER_WALLET = 3;
+    uint256 public constant LOCK_PERIOD_SECONDS = 2 days; 
+
     struct TicketTier {
         string name;
         uint price;
@@ -28,21 +31,18 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     uint256 public eventId; 
 
     address public factory;
-    uint256 public maxPerWallet;
-    uint256 public lockPeriod;
     uint public eventDate;
 
     TicketTier[] public tiers;
+    
+    bool public tiersSet = false;
 
     mapping(uint256 => Ticket) public tickets;
-    mapping(uint256 => uint256) public purchaseTimestamp;
     mapping(address => uint256) public purchasedCount;
     mapping(uint256 => string) private _tokenURIs;
-
     string public eventTitle;
     string public eventInfo;
     string public eventVenue;
-
     bool public saleActive = true;
     bool public eventEnded = false;
 
@@ -54,48 +54,45 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
     event SaleStatusChanged(bool active);
     event Withdrawn(address indexed to, uint256 amount);
 
-    modifier onlyFactory() {
-        require(msg.sender == factory, "only factory");
-        _;
-    }
 
     modifier whenSaleActive() {
         require(saleActive, "sale not active!");
         _;
     }
 
-    constructor() ERC721("NFTix Ticket", "NFTIX") Ownable(address(0)) {}
+    modifier onlyFactory() {
+        require(msg.sender == factory, "Only factory can call this");
+        _;
+    }
+
+    constructor() ERC721("NFTix Ticket", "NFTIX") Ownable(msg.sender) {}
 
     function initialize(
         address _organizer,
         address _factory,
         uint _eventId,
-        uint256 _maxPerWallet,
         string memory _eventTitle,
         string memory _eventInfo,
         string memory _eventVenue,
-        uint256 _eventDate,
-        uint256 _lockPeriodSeconds,
-        TicketTier[] memory _tiers
+        uint256 _eventDate
     ) external {
         require(owner() == address(0), "Already initialized");
         _transferOwnership(_organizer);
 
-        require(_factory != address(0), "factory required");
-        require(_maxPerWallet > 0, "Max Per Wallet should be more than 0");
-
         factory = _factory;
         eventId = _eventId;
-        maxPerWallet = _maxPerWallet;
         eventTitle = _eventTitle;
         eventVenue = _eventVenue;
         eventDate = _eventDate;
         eventInfo = _eventInfo;
-        lockPeriod = _lockPeriodSeconds == 0 ? 172800 : _lockPeriodSeconds;
-
+    }
+    
+    function addTiers(TicketTier[] memory _tiers) external onlyFactory {
+        require(!tiersSet, "Tiers have already been set");
         for (uint i = 0; i < _tiers.length; i++) {
             tiers.push(_tiers[i]);
         }
+        tiersSet = true;
     }
 
     function buyTicket(uint tierIndex, uint quantity) 
@@ -105,7 +102,9 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         whenSaleActive 
         returns(uint[] memory) 
     {
-        require(purchasedCount[msg.sender] + quantity <= maxPerWallet, "Exceed ticket buy limit");
+        require(tiersSet, "Tickets are not ready for sale yet");
+
+        require(purchasedCount[msg.sender] + quantity <= MAX_PER_WALLET, "Exceed ticket buy limit per wallet (max 3)");
         require(tierIndex < tiers.length, "Invalid tier");
         require(block.timestamp < eventDate, "Event closed");
 
@@ -113,13 +112,12 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         require(tier.sold + quantity <= tier.maxSupply, "Tier sold out");
 
         uint totalPrice = tier.price * quantity;
-        require(msg.value == totalPrice, "Invalid payment amount");
+        require(msg.value >= totalPrice, "Insufficient payment amount");
 
         uint[] memory newTokenIds = new uint[](quantity);
 
         for (uint i = 0; i < quantity; i++) {
             uint256 tokenId = _tokenIdCounter++;
-            
             _safeMint(msg.sender, tokenId);
             
             tickets[tokenId] = Ticket({
@@ -130,7 +128,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
                 purchaseTimestamp: block.timestamp
             });
             
-            purchaseTimestamp[tokenId] = block.timestamp;
             newTokenIds[i] = tokenId;
         }
 
@@ -140,20 +137,22 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         }
 
         _recordRevenue(totalPrice);
+
+        if (msg.value > totalPrice) {
+            (bool success, ) = payable(msg.sender).call{value: msg.value - totalPrice}("");
+            require(success, "Refund failed");
+        }
         
         emit TicketsPurchased(msg.sender, newTokenIds, tierIndex, quantity);
         return newTokenIds;
     }
 
     function markAsUsed(uint256 tokenId) external onlyOwner {
-        _requireOwned(tokenId);
-        
         Ticket storage ticket = tickets[tokenId];
-        
         require(!ticket.used, "Ticket already used");
-        require(block.timestamp == eventDate, "Not event day!");
+        uint eventEnd = eventDate + 12 hours; 
+        require(block.timestamp >= eventDate && block.timestamp <= eventEnd, "Check-in window is not active");
         ticket.used = true;
-        
         emit TicketUsed(tokenId, ownerOf(tokenId), block.timestamp);
     }
 
@@ -202,11 +201,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         }
     }
 
-    function setLockPeriod(uint256 newLockPeriod) external onlyOwner {
-        emit LockPeriodChanged(lockPeriod, newLockPeriod);
-        lockPeriod = newLockPeriod;
-    }
-
     function setFactory(address newFactory) external onlyOwner {
         require(newFactory != address(0), "Invalid factory address!");
         address old = factory;
@@ -251,8 +245,6 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
             }
         }
         
-        delete purchaseTimestamp[tokenId];
-        delete _tokenURIs[tokenId];
         delete tickets[tokenId];
         
         emit TicketBurned(tokenId);
@@ -281,17 +273,18 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
 
     function isLocked(uint256 tokenId) public view returns (bool) {
         _requireOwned(tokenId);
-        uint256 ts = purchaseTimestamp[tokenId];
+        uint256 ts = tickets[tokenId].purchaseTimestamp;
         if (ts == 0) return false;
-        return block.timestamp < (ts + lockPeriod);
+
+        return block.timestamp < (ts + LOCK_PERIOD_SECONDS);
     }
 
     function remainingLockSeconds(uint256 tokenId) external view returns (uint256) {
         _requireOwned(tokenId);
-        uint256 ts = purchaseTimestamp[tokenId];
+        uint256 ts = tickets[tokenId].purchaseTimestamp;
         if (ts == 0) return 0;
-        
-        uint256 unlockAt = ts + lockPeriod;
+
+        uint256 unlockAt = ts + LOCK_PERIOD_SECONDS;
         if (block.timestamp >= unlockAt) return 0;
         
         return unlockAt - block.timestamp;
@@ -341,22 +334,10 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         return super._update(to, tokenId, auth);
     }
 
-
     function _recordRevenue(uint256 amount) internal {
         (bool success, ) = factory.call(
             abi.encodeWithSignature("recordRevenue(uint256,uint256)", eventId, amount)
         );
         require(success, "Revenue record failed");
-    }
-
-    function _getTierPrefix(string memory tierName) internal pure returns (string memory) {
-        bytes memory nameBytes = bytes(tierName);
-        if (nameBytes.length <= 4) return tierName;
-        
-        bytes memory prefix = new bytes(4);
-        for (uint i = 0; i < 4; i++) {
-            prefix[i] = nameBytes[i];
-        }
-        return string(prefix);
     }
 }

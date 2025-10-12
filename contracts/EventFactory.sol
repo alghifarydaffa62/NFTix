@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 import "./Ticket.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
+
 contract EventFactory {
     struct Event {
         uint id;
@@ -17,6 +19,7 @@ contract EventFactory {
         address ticketContract;
     }
 
+    address public immutable ticketImplementation;
     Event[] public events;
     mapping(address => uint[]) public organizerEvents;
 
@@ -41,6 +44,10 @@ contract EventFactory {
         _;
     }
 
+    constructor(address _ticketImplementation) {
+        ticketImplementation = _ticketImplementation;
+    }
+
     function createEvent(
         string memory _name,
         string memory _desc,
@@ -58,21 +65,10 @@ contract EventFactory {
         require(_maxParticipant > 0, "Invalid max participant!");
         require(_deadline < _date, "Invalid Event deadline");
 
-        TicketNFT newTicketContract = new TicketNFT(
-            address(this),
-            eventIDCounter,
-            string.concat('Ticket ', _name),
-            'NFTIX',
-            3,
-            _name,
-            _desc,
-            _venue,
-            _date,
-            172800,
-            _tiers
-        );
+        address cloneAddress = Clones.clone(ticketImplementation);
 
-        address _ticketContract = address(newTicketContract);
+        TicketNFT newTicketContract = TicketNFT(cloneAddress);
+        newTicketContract.initialize(msg.sender, address(this), eventIDCounter, 3, _name, _desc, _venue, _date, 172800, _tiers);
 
         Event memory newEvent = Event({
             id: eventIDCounter,
@@ -86,14 +82,14 @@ contract EventFactory {
             deadline: _deadline,
             totalRevenue: 0,
             active: true,
-            ticketContract: address(newTicketContract)
+            ticketContract: cloneAddress
         });
 
         events.push(newEvent);
 
         organizerEvents[msg.sender].push(eventIDCounter);
 
-        emit EventCreated(eventIDCounter, _name, msg.sender, _date, _ticketContract);
+        emit EventCreated(eventIDCounter, _name, msg.sender, _date, cloneAddress);
 
         eventId = eventIDCounter;
         eventIDCounter++;

@@ -55,8 +55,8 @@ export default function EventDetailPage() {
 
                 const formattedTiers = tiersData.map(tier => ({
                     name: tier.name,
-                    price: tier.price,
-                    priceInEth: formatEther(tier.price),
+                    price: tier.price, 
+                    priceInEth: formatEther(tier.price), 
                     maxSupply: Number(tier.maxSupply),
                     sold: Number(tier.sold)
                 }));
@@ -133,10 +133,7 @@ export default function EventDetailPage() {
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left: Event Details */}
                     <EventDetails event={event}/>
-
-                    {/* Right: Ticket Tiers */}
                     <TicketTiers tiers={tiers} event={event} onBuyTicket={handleBuyTicket}/>
                 </div>
             </div>

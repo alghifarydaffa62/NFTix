@@ -11,7 +11,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
     const [txHash, setTxHash] = useState("")
 
     const pricePerTicket = parseFloat(tier.priceInEth)
-    const totalPrice = (pricePerTicket * quantity).toFixed(4)
+    const totalPrice = (pricePerTicket * quantity)
 
     const handleBuy = async () => {
         setError("")
@@ -21,7 +21,8 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             const result = await BuyTicket({
                 ticketContractAddress: event.ticketContract,
                 tierIndex: tier.tierIndex,
-                quantity: quantity
+                quantity: quantity,
+                priceInWei: tier.price
             })
 
             if(result.success) {
@@ -40,6 +41,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             setLoading(false)
         }
     }
+    
     return(
         <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
@@ -134,7 +136,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                                     <div className="text-right">
                                         <p className="text-sm text-gray-600 mb-1">Price</p>
                                         <p className="text-2xl font-bold text-blue-600">
-                                            {pricePerTicket.toFixed(4)}
+                                            {pricePerTicket}
                                         </p>
                                         <p className="text-xs text-gray-500">ETH per ticket</p>
                                     </div>
@@ -190,9 +192,8 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                                     <div>
                                         <p className="text-sm opacity-90 mb-1">Total Price</p>
                                         <p className="text-4xl font-bold">
-                                            {totalPrice}
+                                            {totalPrice} ETH
                                         </p>
-                                        <p className="text-sm opacity-90 mt-1">ETH</p>
                                     </div>
                                     <div className="text-right text-sm opacity-90">
                                         <p>{quantity} ticket{quantity > 1 ? 's' : ''}</p>

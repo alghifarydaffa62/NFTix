@@ -85,6 +85,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         eventVenue = _eventVenue;
         eventDate = _eventDate;
         eventInfo = _eventInfo;
+        saleActive = true;
     }
     
     function addTiers(TicketTier[] memory _tiers) external onlyFactory {

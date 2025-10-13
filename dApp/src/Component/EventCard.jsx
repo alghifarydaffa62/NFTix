@@ -1,10 +1,15 @@
 import { ipfsToHttp, formatDate } from "../Utils/fetchOrganizerEvents";
+import { useNavigate } from "react-router-dom";
 
 export default function EventCard({ event }) {
   const imageUrl = ipfsToHttp(event.imageURI);
+  const navigate = useNavigate()
 
   const hasTicketContract = event.ticketContract !== "0x0000000000000000000000000000000000000000";
-  
+  const handleShowDetailPage = () => {
+      navigate(`/buyer/event/${event.id}`)
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
       <div className="relative h-48 bg-gray-200">
@@ -76,12 +81,7 @@ export default function EventCard({ event }) {
 
                 <div className="flex items-center gap-2">
                     {hasTicketContract ? (
-                        <span className="text-green-600 text-xs font-medium flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            Tickets Available
-                        </span>
+                        <button onClick={handleShowDetailPage} className="cursor-pointer mt-2 px-4 py-2 rounded-md bg-blue-700 text-white font-semibold">Buy Ticket</button>
                     ) : (
                         <span className="text-orange-600 text-xs font-medium flex items-center gap-1">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

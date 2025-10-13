@@ -2,7 +2,7 @@ import { useState } from "react"
 import CreateNewEvent from "../Utils/CreateNewEvent"
 import CreateTicket from "./CreateTicket"
 
-export default function CreateEvent() {
+export default function CreateEvent({ tiers }) {
     const [name, setName] = useState("")
     const [desc, setDesc] = useState("")
     const [eventIMG, setEventIMG] = useState(null)
@@ -10,8 +10,6 @@ export default function CreateEvent() {
     const [venue, setVenue] = useState("")
     const [maxParticipants, setMaxParticipants] = useState("")
     const [deadline, setDeadline] = useState("")
-
-    const [tiers, setTiers] = useState([])
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -31,10 +29,6 @@ export default function CreateEvent() {
             }
             reader.readAsDataURL(file)
         }
-    }
-
-    const handleTiersChange = (updatedTiers) => {
-        setTiers(updatedTiers)
     }
 
     const validateForm = () => {
@@ -87,7 +81,7 @@ export default function CreateEvent() {
         setLoading(true)
 
         try {
-            const result = await CreateNewEvent(
+            const result = await CreateNewEvent({
                 name, 
                 desc,
                 eventIMG,
@@ -96,7 +90,7 @@ export default function CreateEvent() {
                 maxParticipants,
                 deadline,
                 tiers
-            )
+            })
 
             if(result.success) {
                 setSuccess(true)
@@ -299,42 +293,17 @@ export default function CreateEvent() {
                     </div>
                 </div>
 
-                {/* Event Summary */}
-                {tiers.length > 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                        <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                {tiers && tiers.length > 0 && (
+                    <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                        <div className="flex items-center gap-2 text-green-800">
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                            Event Summary
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                            <div className="bg-white p-3 rounded">
-                                <p className="text-blue-700 font-medium">Total Tiers</p>
-                                <p className="text-2xl font-bold text-blue-900">{tiers.length}</p>
-                            </div>
-                            <div className="bg-white p-3 rounded">
-                                <p className="text-blue-700 font-medium">Total Tickets</p>
-                                <p className="text-2xl font-bold text-blue-900">
-                                    {tiers.reduce((sum, t) => sum + parseInt(t.maxSupply), 0)}
-                                </p>
-                            </div>
-                            <div className="bg-white p-3 rounded">
-                                <p className="text-blue-700 font-medium">Lowest Price</p>
-                                <p className="text-2xl font-bold text-blue-900">
-                                    {Math.min(...tiers.map(t => parseFloat(t.price))).toFixed(3)} ETH
-                                </p>
-                            </div>
-                            <div className="bg-white p-3 rounded">
-                                <p className="text-blue-700 font-medium">Potential Revenue</p>
-                                <p className="text-2xl font-bold text-blue-900">
-                                    {tiers.reduce((sum, t) => sum + (parseFloat(t.price) * parseInt(t.maxSupply)), 0).toFixed(3)} ETH
-                                </p>
-                            </div>
+                            <strong>{tiers.length} tier(s) added</strong>
                         </div>
                     </div>
                 )}
+                
 
                 {/* Submit Button */}
                 <button
@@ -372,7 +341,7 @@ export default function CreateEvent() {
                     ) : tiers.length === 0 ? (
                         'Add at least 1 tier to continue'
                     ) : (
-                        'Create Event'
+                        `Create Event with ${tiers.length} tier(s)`
                     )}
                 </button>
             </form>

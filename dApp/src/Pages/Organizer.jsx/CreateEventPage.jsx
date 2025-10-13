@@ -10,6 +10,8 @@ export default function CreateEventPage() {
     const navigate = useNavigate()
     const [isChecking, setIsChecking] = useState(true)
 
+    const [tiers, setTiers] = useState([])
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsChecking(false)
@@ -24,16 +26,32 @@ export default function CreateEventPage() {
         }
     }, [isChecking, isConnected, navigate])
 
+    const handleTiersChange = (updatedTiers) => {
+        setTiers(updatedTiers)
+    }
+
     return(
-        <div className="flex max-h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-gray-100">
             <SidebarOrganizer/>
-            {/* Main Content */}
+
             <main className="flex-1 p-8 overflow-y-scroll">
-                <h1 className="text-2xl font-bold mb-4 text-center">
+                <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
                     Create Your Event
                 </h1>
 
-                <CreateEvent/>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2">
+                        <CreateEvent tiers={tiers} />
+                    </div>
+
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-6">
+                            <CreateTicket 
+                                onTiersChange={handleTiersChange}
+                            />
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     )

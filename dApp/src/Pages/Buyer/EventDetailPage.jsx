@@ -2,7 +2,7 @@ import EventFactoryABI from "../../../../artifacts/contracts/EventFactory.sol/Ev
 import TicketNFTABI from "../../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { Contract, BrowserProvider } from "ethers"
+import { Contract, BrowserProvider, formatEther } from "ethers"
 import { useAppKitAccount } from "@reown/appkit/react"
 import BuyTicketModal from "../../Component/BuyTicketModal"
 
@@ -45,14 +45,22 @@ export default function EventDetailPage() {
 
             setEvent(eventData)
 
-            const ticketContract = new Contract(
-                eventData.ticketContract,
-                TicketNFTABI.abi,
-                provider
-            )
+            if (eventData.ticketContract === "0x0000000000000000000000000000000000000000") {
+                setTiers([]); 
+            } else {
+                const ticketContract = new Contract(eventData.ticketContract, TicketNFTABI.abi, provider);
+                const tiersData = await ticketContract.getAllTiers();
 
-            const tiersData = await ticketContract.getAllTiers()
-            setTiers(tiersData)
+                const formattedTiers = tiersData.map(tier => ({
+                    name: tier.name,
+                    price: tier.price,
+                    priceInEth: formatEther(tier.price),
+                    maxSupply: Number(tier.maxSupply),
+                    sold: Number(tier.sold)
+                }));
+                
+                setTiers(formattedTiers);
+            }
         } catch(err) {
             setError(err.message || "Failed to load event details")
         } finally {
@@ -72,7 +80,7 @@ export default function EventDetailPage() {
 
     const handleBuySuccess = () => {
         setShowBuyModal(false)
-        fetchEventDetails() // Refresh tiers data
+        fetchEventDetails() 
     }
 
     if (loading) {
@@ -261,7 +269,7 @@ export default function EventDetailPage() {
                                         {event.organizer.slice(0, 6)}...{event.organizer.slice(-4)}
                                     </p>
                                     <a 
-                                        href={`https://polygonscan.com/address/${event.organizer}`}
+                                        href={`https://etherscan.io/address/${event.organizer}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-sm text-blue-600 hover:underline"
@@ -307,9 +315,8 @@ export default function EventDetailPage() {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-2xl font-bold text-blue-600">
-                                                            {(Number(tier.price) / 1e18).toFixed(3)}
+                                                            {(Number(tier.price) / 1e18)} ETH
                                                         </p>
-                                                        <p className="text-sm text-gray-600">ETH</p>
                                                     </div>
                                                 </div>
 

@@ -48,7 +48,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                 qrResults.forEach((qr, index) => {
                     if (qr.success) {
                         existingTickets.push({
-                            tokenId: result.tokenIds[index],
+                            tokenId: result.tokenIds[index].toString(),
                             contractAddress: event.ticketContract,
                             eventName: event.name,
                             eventDate: event.date,
@@ -71,6 +71,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             }
 
         } catch(err) {
+            console.error("!!! KESALAHAN KRITIS DI DALAM handleBuy:", err); 
             setError(err.message || "An unexpected error occurred")
         } finally {
             setLoading(false)
@@ -128,7 +129,6 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                         </button>
                     </div>
                 ) : (
-                    /* Purchase Form */
                     <>
                         {/* Header */}
                         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-2xl">

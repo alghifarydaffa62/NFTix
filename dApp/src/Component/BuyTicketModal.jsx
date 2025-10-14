@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
 import BuyTicket from "../Utils/BuyTicket"
+import GenerateQR from "../Utils/generateQR"
 
 export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
     const { address } = useAppKitAccount()
@@ -9,6 +10,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
     const [error, setError] = useState("")
     const [success, setSuccess] = useState(false)
     const [txHash, setTxHash] = useState("")
+    const [tokenIds, setTokenIds] = useState([])
 
     const pricePerTicket = parseFloat(tier.priceInEth)
     const totalPrice = (pricePerTicket * quantity)
@@ -28,6 +30,39 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             if(result.success) {
                 setSuccess(true)
                 setTxHash(result.transactionHash)
+                setTokenIds(result.tokenIds)
+
+                const qrGenerationPromises = result.tokenIds.map(tokenId =>
+                    GenerateQR({
+                        tokenId: tokenId,
+                        contractAddress: event.ticketContract,
+                        ownerAddress: address,
+                        eventId: event.id.toString()
+                    })
+                );
+
+                const qrResults = await Promise.all(qrGenerationPromises);
+
+                const existingTickets = JSON.parse(localStorage.getItem('myTickets') || '[]');
+                
+                qrResults.forEach((qr, index) => {
+                    if (qr.success) {
+                        existingTickets.push({
+                            tokenId: result.tokenIds[index],
+                            contractAddress: event.ticketContract,
+                            eventName: event.name,
+                            eventDate: event.date,
+                            venue: event.venue,
+                            tier: tier.name,
+                            qrCode: qr.qrCodeImage,
+                            purchaseDate: Date.now(),
+                            txHash: result.transactionHash
+                        });
+                    }
+                });
+
+                localStorage.setItem('myTickets', JSON.stringify(existingTickets));
+
                 setTimeout(() => {
                     onSuccess()
                 }, 2000)

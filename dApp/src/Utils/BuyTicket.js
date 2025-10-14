@@ -39,13 +39,31 @@ export default async function BuyTicket({ ticketContractAddress, tierIndex, quan
             }
         );
 
-        console.log("Transaction sent, waiting for confirmation...", tx.hash);
         const receipt = await tx.wait();
-        console.log("Transaction confirmed!", receipt);
+
+        const tokenIds = [];
+
+        const transferEvents = receipt.logs.filter(log => {
+            try {
+                const parsed = ticketContract.interface.parseLog(log);
+                return parsed && parsed.name === 'Transfer';
+            } catch {
+                return false;
+            }
+        });
+
+        for (const event of transferEvents) {
+            const parsed = ticketContract.interface.parseLog(event);
+            if (parsed && parsed.args.tokenId) {
+                tokenIds.push(parsed.args.tokenId.toString());
+            }
+        }
 
         return {
             success: true,
             transactionHash: receipt.hash,
+            tokenIds: tokenIds,
+            contractAddress: ticketContractAddress,
             message: `Successfully purchased ${quantity} ticket(s)!`
         };
 

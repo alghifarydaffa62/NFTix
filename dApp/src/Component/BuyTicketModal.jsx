@@ -51,12 +51,14 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                             tokenId: result.tokenIds[index].toString(),
                             contractAddress: event.ticketContract,
                             eventName: event.name,
-                            eventDate: event.date,
+                            eventDate: event.date.toString(),
                             venue: event.venue,
                             tier: tier.name,
+                            priceInWei: tier.price.toString(),
                             qrCode: qr.qrCodeImage,
                             purchaseDate: Date.now(),
-                            txHash: result.transactionHash
+                            txHash: result.transactionHash,
+                            ownerAddress: address
                         });
                     }
                 });

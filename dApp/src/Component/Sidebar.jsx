@@ -15,9 +15,9 @@ export default function Sidebar() {
     const isActive = (path) => location.pathname == path
 
     return(
-        <aside className="w-64 bg-blue-900 text-white flex flex-col justify-between">
+        <aside className="w-64 bg-[hsla(163,70%,34%,1)] text-white flex flex-col justify-between">
             <div>
-                <div className="p-4 text-center font-bold text-xl border-b border-blue-700">
+                <div className="p-4 text-center font-bold text-xl">
                     NFTix Dashboard
                 </div>
                 <ul className="p-4 space-y-3">
@@ -26,8 +26,8 @@ export default function Sidebar() {
                             href="/buyer" 
                             className={`block p-2 rounded transition ${
                                 isActive("/buyer")
-                                ? "bg-blue-500 font-semibold"
-                                : "hover:bg-blue-800"
+                                ? "bg-[hsla(163,70%,25%,1)]"
+                                : "hover:bg-green-800"
                             }`}
                         >Event</a>
                     </li>
@@ -36,8 +36,8 @@ export default function Sidebar() {
                             href="/buyer/MyEvents" 
                             className={`block p-2 rounded transition ${
                                 isActive("/buyer/MyEvents")
-                                ? "bg-blue-500 font-semibold"
-                                : "hover:bg-blue-800"
+                                ? "bg-[hsla(163,70%,25%,1)]"
+                                : "hover:bg-green-800"
                             }`}
                         >Active Events</a>
                     </li>
@@ -46,18 +46,18 @@ export default function Sidebar() {
                             href="/buyer/history" 
                             className={`block p-2 rounded transition ${
                                 isActive("/buyer/history")
-                                ? "bg-blue-500 font-semibold"
-                                : "hover:bg-blue-800"
+                                ? "bg-[hsla(163,70%,25%,1)]"
+                                : "hover:bg-green-800"
                             }`}
                         >History</a>
                     </li>
                 </ul>
             </div>
 
-            <div className="p-4 border-t border-blue-700">
+            <div className="p-4">
                 <button
                     onClick={handleDisconnect}
-                    className="cursor-pointer w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded font-semibold transition"
+                    className="cursor-pointer w-full bg-[hsla(0,0%,93%,1)] text-[hsla(179,64%,26%,1)] py-2 rounded font-bold transition"
                 >
                     Disconnect
                 </button>

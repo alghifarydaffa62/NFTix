@@ -35,17 +35,21 @@ export default function BuyerPage() {
     }
 
     return(
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-100">
             <Sidebar/>
 
-            <main className="flex-1 p-8">
-                <h1 className="text-2xl font-bold mb-4 text-center">
-                    Welcome Buyer! {address}
-                </h1>
+            <main className="flex-1 overflow-y-scroll">
+                <div className="bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))]">
+                    <h1 className="text-md font-semibold text-white h-14 p-4">
+                        Organizer Connected: {address}
+                    </h1>
+                </div>
 
-                <h1 className="text-xl font-semibold">All Active Events</h1>
-                <div className="mt-8">
-                    <ShowAllEvents/>
+                <div className="p-6">
+                    <h1 className="text-xl font-semibold">All Active Events</h1>
+                    <div className="mt-8">
+                        <ShowAllEvents/>
+                    </div>
                 </div>
             </main>
         </div>

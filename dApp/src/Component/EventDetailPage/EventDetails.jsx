@@ -1,4 +1,4 @@
-import { ipfsToHttp } from "../Utils/fetchOrganizerEvents";
+import { ipfsToHttp } from "../../Utils/fetchOrganizerEvents";
 
 const DetailItem = ({ icon, label, value, subValue }) => (
     <div className="flex items-start gap-3">

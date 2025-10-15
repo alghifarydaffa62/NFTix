@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import fetchAllEvents from "../Utils/fetchAllEvents"
-import EventCard from "./EventCard"
+import fetchAllEvents from "../../Utils/fetchAllEvents"
+import EventCard from "../EventCard"
 
 export default function ShowAllEvents() {
     const [events, setEvents] = useState([])

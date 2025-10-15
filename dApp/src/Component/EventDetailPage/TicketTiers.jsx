@@ -1,4 +1,4 @@
-import TierCard from "./TierCard"
+import TierCard from "../TierCard"
 
 export default function TicketTiers({ tiers, event, onBuyTicket }) {
     const eventDate = new Date(Number(event.date) * 1000);

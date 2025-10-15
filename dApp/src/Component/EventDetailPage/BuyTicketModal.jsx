@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
-import BuyTicket from "../Utils/BuyTicket"
-import GenerateQR from "../Utils/generateQR"
+import BuyTicket from "../../Utils/BuyTicket"
+import GenerateQR from "../../Utils/generateQR"
 
 export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
     const { address } = useAppKitAccount()

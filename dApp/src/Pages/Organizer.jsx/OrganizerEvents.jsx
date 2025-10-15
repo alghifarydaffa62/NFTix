@@ -2,7 +2,7 @@ import { useAppKitAccount } from "@reown/appkit/react"
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SidebarOrganizer from "../../Component/SidebarOrganizer";
-import OrganizerMyEvent from "../../Component/OrganizerMyEvent";
+import OrganizerMyEvent from "../../Component/OrganizerEventsPage/OrganizerMyEvent";
 
 export default function OrganizerEvents() {
     const { isConnected } = useAppKitAccount()

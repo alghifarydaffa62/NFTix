@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useAppKitAccount } from "@reown/appkit/react"
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Component/Sidebar";
-import ShowAllEvents from "../Component/ShowAllEvents";
+import ShowAllEvents from "../Component/BuyerPage/ShowAllEvents";
 
 export default function BuyerPage() {
     const { address, isConnected } = useAppKitAccount()

@@ -4,9 +4,9 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Contract, BrowserProvider, formatEther } from "ethers"
 import { useAppKitAccount } from "@reown/appkit/react"
-import BuyTicketModal from "../../Component/BuyTicketModal"
-import EventDetails from "../../Component/EventDetails"
-import TicketTiers from "../../Component/TicketTiers"
+import BuyTicketModal from "../../Component/EventDetailPage/BuyTicketModal"
+import EventDetails from "../../Component/EventDetailPage/EventDetails"
+import TicketTiers from "../../Component/EventDetailPage/TicketTiers"
 
 export default function EventDetailPage() {
     const { eventId } = useParams()

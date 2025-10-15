@@ -1,5 +1,5 @@
-import fetchOrganizerEvents from "../Utils/fetchOrganizerEvents"
-import EventCard from "./EventCard"
+import fetchOrganizerEvents from "../../Utils/fetchOrganizerEvents"
+import EventCard from "../EventCard"
 import { useState, useEffect } from "react"
 
 export default function OrganizerMyEvent({userAddress}) {

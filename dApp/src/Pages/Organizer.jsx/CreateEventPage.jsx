@@ -31,7 +31,7 @@ export default function CreateEventPage() {
     }
 
     return(
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-100">
             <SidebarOrganizer/>
 
             <main className="flex-1 p-8 overflow-y-scroll">
@@ -45,7 +45,7 @@ export default function CreateEventPage() {
                     </div>
 
                     <div className="lg:col-span-1">
-                        <div className="sticky top-6">
+                        <div className="top-6">
                             <CreateTicket 
                                 onTiersChange={handleTiersChange}
                             />

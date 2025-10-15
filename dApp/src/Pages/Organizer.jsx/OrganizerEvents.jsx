@@ -26,7 +26,7 @@ export default function OrganizerEvents() {
     const userAddress = localStorage.getItem("userWallet")
 
     return(
-        <div className="flex max-h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-100">
             <SidebarOrganizer/>
 
             {/* Main Content */}

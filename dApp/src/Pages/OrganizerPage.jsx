@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppKitAccount} from "@reown/appkit/react"
 import SidebarOrganizer from "../Component/SidebarOrganizer";
 import fetchOrganizerEvents from "../Utils/fetchOrganizerEvents";
+import total from "../assets/total.png"
 
 export default function OrganizerPage() {
     const { address, isConnected } = useAppKitAccount()
@@ -60,22 +61,72 @@ export default function OrganizerPage() {
     }
 
     return(
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-100">
             <SidebarOrganizer/>
             {/* Main Content */}
-            <main className="flex-1 p-8">
-                <h1 className="text-2xl font-bold mb-4 text-center">
-                    Welcome organizer! {address}
-                </h1>
+            <main className="flex-1">
+                <div className="bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))]">
+                    <h1 className="text-lg font-semibold text-white mb-4 p-4">
+                        Organizer Connected: {address}
+                    </h1>
+                </div>
+                
+                <div className="px-6">
+                    <h1 className="text-[hsla(179,64%,26%,1)] font-bold tracking-wider text-3xl">DASHBOARD</h1>
+                    <h1 className="text-gray-500 font-semibold text-lg mt-1">Welcome Back, Organizer!</h1>
 
-                <div className="p-5 bg-blue-800 w-fit text-white rounded-md">
-                    <h1>Total Events Created</h1>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+                        <div className="flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md">
+                            <div className="p-3 rounded-md bg-[hsla(182,67%,25%,1)]">
+                                <img src={total} alt="Total Events" />
+                            </div>
 
-                    {isLoadingEvents ? (
-                        <p>Loading total...</p>
-                    ) : (
-                        <p className="text-3xl font-bold">{totalEvents}</p>
-                    )}
+                            <div className="flex-1">
+                                <h1>Total Events</h1>
+                                {isLoadingEvents ? (
+                                    <p>Loading total...</p>
+                                ) : (
+                                    <p className="text-xl font-semibold">{totalEvents} Events</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* CARD 2 */}
+                        <div className="flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md">
+                            <div className="p-3 rounded-md bg-[hsla(182,67%,25%,1)]">
+                                <img src={total} alt="Tickets Sold" />
+                            </div>
+
+                            <div className="flex-1">
+                                <h1>Tickets Sold</h1>
+                                <p className="text-xl font-semibold">1 Tickets</p>
+                            </div>
+                        </div>
+
+                        {/* CARD 3 */}
+                        <div className="flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md">
+                            <div className="p-3 rounded-md bg-[hsla(182,67%,25%,1)]">
+                                <img src={total} alt="Total Revenue" />
+                            </div>
+
+                            <div className="flex-1">
+                                <h1>Total Revenue</h1>
+                                <p className="text-xl font-semibold">0.23142 ETH</p>
+                            </div>
+                        </div>
+
+                        {/* CARD 4 */}
+                        <div onClick={() => navigate('/organizer/create')} className="cursor-pointer flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md">
+                            <div className="p-3 rounded-md bg-[hsla(182,67%,25%,1)]">
+                                <img src={total} alt="Another Stat" />
+                            </div>
+
+                            <div>
+                                <h1>Create New Event</h1>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>

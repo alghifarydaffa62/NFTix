@@ -1,14 +1,14 @@
 import { ipfsToHttp, formatDate } from "../Utils/fetchOrganizerEvents";
 import { useNavigate } from "react-router-dom";
 
-export default function EventCard({ event }) {
-  const imageUrl = ipfsToHttp(event.imageURI);
-  const navigate = useNavigate()
+export default function OrganizerEventCard({ event }) {
+    const imageUrl = ipfsToHttp(event.imageURI);
+    const navigate = useNavigate()
 
-  const hasTicketContract = event.ticketContract !== "0x0000000000000000000000000000000000000000";
-  const handleShowDetailPage = () => {
-      navigate(`/event/${event.id}`)
-  }
+//   const hasTicketContract = event.ticketContract !== "0x0000000000000000000000000000000000000000";
+//   const handleShowDetailPage = () => {
+//       navigate(`/buyer/event/${event.id}`)
+//   }
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
@@ -79,20 +79,27 @@ export default function EventCard({ event }) {
                     <span>Max: {event.maxParticipants} participants</span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    {hasTicketContract ? (
-                        <button onClick={handleShowDetailPage} className="cursor-pointer mt-2 px-4 py-2 rounded-md bg-blue-700 text-white font-semibold">Buy Ticket</button>
-                    ) : (
-                        <span className="text-orange-600 text-xs font-medium flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                            Tickets Not Setup
-                        </span>
-                    )}
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => navigate(`/event/${event.id}`)}
+                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                    >
+                        View Details
+                    </button>
+                    
+                    {/* ✅ Scanner Button */}
+                    <button
+                        onClick={() => navigate(`/organizer/scanner/${event.id}`)}
+                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        Scanner
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-  );
+  )
 }

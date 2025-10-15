@@ -1,5 +1,5 @@
 import fetchOrganizerEvents from "../../Utils/fetchOrganizerEvents"
-import EventCard from "../EventCard"
+import OrganizerEventCard from "../OrganizerEventCard"
 import { useState, useEffect } from "react"
 
 export default function OrganizerMyEvent({userAddress}) {
@@ -95,7 +95,7 @@ export default function OrganizerMyEvent({userAddress}) {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {events.map((event) => (
-                        <EventCard key={event.id} event={event} />
+                        <OrganizerEventCard key={event.id} event={event} />
                     ))}
                 </div>
             )}

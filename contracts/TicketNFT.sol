@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
+contract TicketNFT is ERC721Enumerable, Ownable, ReentrancyGuard {
     using Strings for uint256;
 
     uint256 public constant MAX_PER_WALLET = 3;
@@ -251,7 +251,7 @@ contract TicketNFT is ERC721, Ownable, ReentrancyGuard {
         emit TicketBurned(tokenId);
     }
 
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view override returns (uint256) {
         return _tokenIdCounter;
     }
 

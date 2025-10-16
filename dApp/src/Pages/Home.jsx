@@ -1,11 +1,19 @@
 import Navbar from "../Component/Navbar"
+import Hero from "../Component/Hero"
+import Features from "../Component/Features"
+import HowItWorks from "../Component/HowItWorks"
+import Statistics from "../Component/Statistics"
+import CTA from "../Component/CTA"
 
 export default function Home() {
     return(
         <div>
             <Navbar/>
-
-            <h1 className="text-6xl font-semibold font-sans text-center my-10">A Modern and Secure Way to<br/>Generate yout Ticket</h1>
+            <Hero/>
+            <Features/>
+            <HowItWorks/>
+            <Statistics/>
+            <CTA/>
         </div>
     )
 }

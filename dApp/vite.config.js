@@ -8,4 +8,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    allowedHosts: [
+      'retiform-carley-nonfundamentally.ngrok-free.dev' 
+    ],
+    host: true,
+    port: 5173,
+  },
 })

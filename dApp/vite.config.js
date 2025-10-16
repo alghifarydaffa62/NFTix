@@ -12,7 +12,6 @@ export default defineConfig({
     allowedHosts: [
       'retiform-carley-nonfundamentally.ngrok-free.dev' 
     ],
-    host: true,
     port: 5173,
   },
 })

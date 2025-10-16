@@ -77,28 +77,23 @@ export default function OrganizerMyEvent({userAddress}) {
 
     return(
         <div className="space-y-6">
-            <h1>All of this address events:</h1>
-            
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">My Events</h1>
-                    <p className="text-gray-600">
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+                        My Events
+                    </h1>
+                    <p className="text-gray-600 text-sm md:text-base">
                         {events.length} event{events.length !== 1 ? "s" : ""} total
                     </p>
                 </div>
             </div>
 
-            {events.length === 0 ? (
-                <div className="text-center py-10 text-gray-500">
-                    No events found.
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {events.map((event) => (
-                        <OrganizerEventCard key={event.id} event={event} />
-                    ))}
-                </div>
-            )}
+            {/* Grid Responsif */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {events.map((event) => (
+                    <OrganizerEventCard key={event.id} event={event} />
+                ))}
+            </div>
         </div>
     )
 }

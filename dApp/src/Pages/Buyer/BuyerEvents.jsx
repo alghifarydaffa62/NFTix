@@ -33,7 +33,7 @@ export default function BuyerEvents() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsChecking(false)
-        }, 500)
+        }, 2000)
 
         return () => clearTimeout(timer)
     }, [])

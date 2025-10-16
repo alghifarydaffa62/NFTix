@@ -210,6 +210,7 @@ export default function EventScannerPage() {
                                         alert("Failed to scan QR code: " + err)
                                         setScanning(false)
                                     }}
+                                    scanning={scanning}
                                 />
                             ) : (
                                 <StartScanner setScanning={setScanning}/>

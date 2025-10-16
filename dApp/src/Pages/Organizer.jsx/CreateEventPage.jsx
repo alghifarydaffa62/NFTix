@@ -15,7 +15,7 @@ export default function CreateEventPage() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsChecking(false)
-        }, 500)
+        }, 2000)
 
         return () => clearTimeout(timer)
     }, [])

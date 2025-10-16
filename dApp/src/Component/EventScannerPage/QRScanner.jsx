@@ -1,49 +1,46 @@
-import { useEffect, useRef, useState } from 'react'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { useEffect, useRef} from 'react'
+import { Html5QrcodeScanner} from 'html5-qrcode'
 
-export default function QRScanner({ onScan, onError }) {
+export default function QRScanner({ onScan, onError, scanning }) {
     const scannerRef = useRef(null)
-    const [scanning, setScanning] = useState(false)
 
     useEffect(() => {
-        if (!scannerRef.current || scanning) return
-
-        const scanner = new Html5QrcodeScanner(
-            "qr-reader",
-            {
-                fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
+        if (!scannerRef.current && scanning) {
+            const scanner = new Html5QrcodeScanner(
+                "qr-reader",
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    disableFlip: false
                 },
-                aspectRatio: 1.0,
-                disableFlip: false
-            },
-            false
-        )
+                false
+            )
 
-        scanner.render(
-            (decodedText, decodedResult) => {
-                console.log("QR Code scanned:", decodedText)
-                scanner.clear()
-                onScan(decodedText)
-            },
-            (errorMessage) => {
-                if (!errorMessage.includes("NotFoundException")) {
-                    console.warn("QR Scan error:", errorMessage)
+            scanner.render(
+                (decodedText) => {
+                    console.log("QR Code scanned:", decodedText)
+                    scanner.clear()
+                    onScan(decodedText)
+                },
+                (errorMessage) => {
+                    if (!errorMessage.includes("NotFoundException")) {
+                        console.warn("QR Scan error:", errorMessage)
+                        if (onError) onError(errorMessage)
+                    }
                 }
-            }
-        )
+            )
 
-        setScanning(true)
-        scannerRef.current = scanner
+            scannerRef.current = scanner
+        }
 
         return () => {
             if (scannerRef.current) {
-                scannerRef.current.clear().catch(err => console.error("Scanner cleanup error:", err))
+                scannerRef.current.clear().catch(err => console.error("Cleanup error:", err))
+                scannerRef.current = null
             }
         }
-    }, [])
+    }, [scanning]) 
 
     return (
         <div>

@@ -11,8 +11,8 @@ export default function OrganizerEventCard({ event }) {
 //   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-      <div className="relative h-48 bg-gray-200">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
+      <div className="relative h-40 sm:h-48 bg-gray-200">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -21,9 +21,9 @@ export default function OrganizerEventCard({ event }) {
             onError={(e) => {
               e.target.style.display = "none";
               e.target.parentElement.innerHTML = `
-                <div class="w-full h-full flex items-center justify-center bg-gray-300">
-                  <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                <div class='w-full h-full flex items-center justify-center bg-gray-300'>
+                  <svg class='w-12 h-12 text-gray-400' fill='currentColor' viewBox='0 0 20 20'>
+                    <path fill-rule='evenodd' d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z' clip-rule='evenodd' />
                   </svg>
                 </div>
               `;
@@ -31,75 +31,61 @@ export default function OrganizerEventCard({ event }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg 
-              className="w-16 h-16 text-gray-400" 
-              fill="currentColor" 
+            <svg
+              className="w-12 h-12 text-gray-400"
+              fill="currentColor"
               viewBox="0 0 20 20"
             >
-              <path 
-                fillRule="evenodd" 
-                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" 
-                clipRule="evenodd" 
+              <path
+                fillRule="evenodd"
+                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                clipRule="evenodd"
               />
             </svg>
           </div>
         )}
       </div>
 
-        <div className="p-4">
-            <h3 className="text-lg font-bold text-gray-800 mb-2 truncate">
-                {event.name}
-            </h3>
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 truncate">
+          {event.name}
+        </h3>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{event.description}</p>
 
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                {event.description}
-            </p>
-
-            <div className="space-y-2 text-sm">
-
-                <div className="flex items-center gap-2 text-gray-700">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>{formatDate(event.date)}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-gray-700">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="truncate">{event.venue}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-gray-700">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <span>Max: {event.maxParticipants} participants</span>
-                </div>
-
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => navigate(`/event/${event.id}`)}
-                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-                    >
-                        View Details
-                    </button>
-                    
-                    {/* ✅ Scanner Button */}
-                    <button
-                        onClick={() => navigate(`/organizer/scanner/${event.id}`)}
-                        className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                        </svg>
-                        Scanner
-                    </button>
-                </div>
-            </div>
+        <div className="space-y-2 text-sm mb-4 flex-1">
+          <div className="flex items-center gap-2 text-gray-700">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>{formatDate(event.date)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-700">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="truncate">{event.venue}</span>
+          </div>
         </div>
+
+        <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+          <button
+            onClick={() => navigate(`/event/${event.id}`)}
+            className="w-full sm:w-1/2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
+          >
+            View Details
+          </button>
+          <button
+            onClick={() => navigate(`/organizer/scanner/${event.id}`)}
+            className="w-full sm:w-1/2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 text-sm sm:text-base"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+            Scanner
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

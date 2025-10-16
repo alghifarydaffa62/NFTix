@@ -12,7 +12,7 @@ export default function OrganizerEvents() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsChecking(false)
-        }, 500)
+        }, 2000)
 
         return () => clearTimeout(timer)
     }, [])
@@ -26,16 +26,18 @@ export default function OrganizerEvents() {
     const userAddress = localStorage.getItem("userWallet")
 
     return(
-        <div className="flex h-screen bg-gray-100">
-            <SidebarOrganizer/>
+        <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+            {/* Sidebar */}
+            <div className="md:w-64 w-full md:h-auto">
+                <SidebarOrganizer />
+            </div>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-scroll p-8">
-                <h1 className="text-2xl font-bold mb-4 text-center">
+            <main className="flex-1 overflow-y-auto p-6 md:p-8">
+                <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center text-gray-800">
                     This is all your events.
                 </h1>
-
-                <OrganizerMyEvent userAddress={userAddress}/>
+                <OrganizerMyEvent userAddress={userAddress} />
             </main>
         </div>
     )

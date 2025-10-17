@@ -20,18 +20,13 @@ export default function ShowAllEvents() {
             setLoading(true)
             setError("")
             
-            console.log("ShowAllEvents: Starting fetch...")
-            
             const result = await fetchAllEvents()
-            
-            console.log("ShowAllEvents: Fetch result:", result)
             
             if (!result) {
                 throw new Error("No result returned from fetchAllEvents")
             }
             
             if (result.success) {
-                console.log("ShowAllEvents: Success! Events:", result.events.length)
                 setEvents(result.events)
                 
                 if (result.events.length === 0) {

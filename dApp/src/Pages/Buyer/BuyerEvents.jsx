@@ -135,9 +135,9 @@ export default function BuyerEvents() {
     }
 
     return(
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-100">
             <Sidebar/>
-            <main className="flex-1 p-8">
+            <main className="flex-1 p-8 overflow-y-scroll">
                 <PageHeader onRefresh={loadTickets} loading={loading}/>
                 <TicketList tickets={tickets} loading={loading} onShowQR={handleShowQR} generatingQR={generatingQR} selectedTicket={selectedTicket}/>
                 <QRModal showQRModal={showQRModal} selectedTicket={selectedTicket} setShowQRModal={setShowQRModal}/>

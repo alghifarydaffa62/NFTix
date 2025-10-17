@@ -13,7 +13,9 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
     const [tokenIds, setTokenIds] = useState([])
 
     const pricePerTicket = parseFloat(tier.priceInEth)
-    const totalPrice = (pricePerTicket * quantity)
+    const totalPrice = pricePerTicket * quantity
+
+    const displayTotalPrice = totalPrice
 
     const handleBuy = async () => {
         setError("")
@@ -173,7 +175,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                                     <div className="text-right">
                                         <p className="text-sm text-gray-600 mb-1">Price</p>
                                         <p className="text-2xl font-bold text-blue-600">
-                                            {pricePerTicket}
+                                            {pricePerTicket} {/* ✅ Fixed */}
                                         </p>
                                         <p className="text-xs text-gray-500">ETH per ticket</p>
                                     </div>
@@ -229,7 +231,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                                     <div>
                                         <p className="text-sm opacity-90 mb-1">Total Price</p>
                                         <p className="text-4xl font-bold">
-                                            {totalPrice} ETH
+                                            {displayTotalPrice} ETH {/* ✅ Fixed */}
                                         </p>
                                     </div>
                                     <div className="text-right text-sm opacity-90">

@@ -12,6 +12,7 @@ export default function OrganizerPage() {
 
     const [totalEvents, setTotalEvents] = useState(0)
     const [isLoadingEvents, setIsLoadingEvents] = useState(true)
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -61,21 +62,67 @@ export default function OrganizerPage() {
     }
 
     return(
-        <div className="flex h-screen bg-gray-100">
-            <SidebarOrganizer/>
+        <div className="flex h-screen bg-gray-100 overflow-hidden">
+            {/* Sidebar */}
+            <div
+                className={`fixed z-40 inset-y-0 left-0 transform ${
+                sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                } transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}
+            >
+                <SidebarOrganizer />
+            </div>
+
+            {/* Overlay (gelap di belakang sidebar pas mobile) */}
+            {sidebarOpen && (
+                <div
+                    onClick={() => setSidebarOpen(false)}
+                    className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
+                ></div>
+            )}
+
             {/* Main Content */}
-            <main className="flex-1">
-                <div className="bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))]">
-                    <h1 className="text-lg font-semibold text-white mb-4 p-4">
+            <main className="flex-1 flex flex-col overflow-y-auto">
+                {/* Navbar atas */}
+                <div className="bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))] flex items-center justify-between p-4">
+                    {/* Tombol hamburger hanya tampil di layar kecil */}
+                    <button
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="md:hidden text-white focus:outline-none"
+                    >
+                        <svg
+                        className="w-7 h-7"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
+                        </svg>
+                    </button>
+
+                    <h1 className="text-lg font-semibold text-white">
                         Organizer Connected: {address}
                     </h1>
-                </div>
-                
-                <div className="px-6">
-                    <h1 className="text-[hsla(179,64%,26%,1)] font-bold tracking-wider text-3xl">DASHBOARD</h1>
-                    <h1 className="text-gray-500 font-semibold text-lg mt-1">Welcome Back, Organizer!</h1>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+                    <div className="w-7 h-7 md:hidden"></div> {/* placeholder biar center */}
+                </div>
+
+                {/* Dashboard content */}
+                <div className="px-6 py-4">
+                    <h1 className="text-[hsla(179,64%,26%,1)] font-bold tracking-wider text-3xl">
+                        DASHBOARD
+                    </h1>
+                    <h2 className="text-gray-500 font-semibold text-lg mt-1">
+                        Welcome Back, Organizer!
+                    </h2>
+
+                {/* Cards grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
+                        {/* CARD 1 */}
                         <div className="flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md">
                             <div className="p-3 rounded-md bg-[hsla(182,67%,25%,1)]">
                                 <img src={total} alt="Total Events" />
@@ -84,9 +131,9 @@ export default function OrganizerPage() {
                             <div className="flex-1">
                                 <h1>Total Events</h1>
                                 {isLoadingEvents ? (
-                                    <p>Loading total...</p>
+                                <p>Loading total...</p>
                                 ) : (
-                                    <p className="text-xl font-semibold">{totalEvents} Events</p>
+                                <p className="text-xl font-semibold">{totalEvents} Events</p>
                                 )}
                             </div>
                         </div>
@@ -116,14 +163,16 @@ export default function OrganizerPage() {
                         </div>
 
                         {/* CARD 4 */}
-                        <div onClick={() => navigate('/organizer/create')} className="cursor-pointer flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md">
+                        <div
+                        onClick={() => navigate("/organizer/create")}
+                        className="cursor-pointer flex gap-5 items-center p-5 bg-white shadow-[0_4px_4px_hsla(0,0%,0%,0.25)] text-[hsla(182,67%,25%,1)] font-bold text-xl rounded-md hover:shadow-lg transition"
+                        >
                             <div className="p-3 rounded-md bg-[hsla(182,67%,25%,1)]">
                                 <img src={total} alt="Another Stat" />
                             </div>
 
                             <div>
                                 <h1>Create New Event</h1>
-                                <p></p>
                             </div>
                         </div>
                     </div>

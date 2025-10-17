@@ -1,15 +1,16 @@
+// src/Utils/generateQR.js
 
 import QRCode from "qrcode"
-import { BrowserProvider } from "ethers"
+import { getSignerProvider } from "./getProvider"
 
 export default async function GenerateQR({ tokenId, contractAddress, ownerAddress, eventId }) {
     try {
-        if (!window.ethereum) {
-            throw new Error("MetaMask not installed");
-        }
+        console.log("🔐 GenerateQR: Getting signer provider...")
 
-        const provider = new BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
+        // ✅ Use unified provider getter (handles AppKit, MetaMask, fallback)
+        const { provider, signer } = await getSignerProvider()
+
+        console.log("📝 GenerateQR: Creating QR payload...")
 
         const qrPayload = {
             ticketId: tokenId,
@@ -26,7 +27,11 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
             timestamp: qrPayload.timestamp
         })
 
+        console.log("✍️ GenerateQR: Signing message...")
+
         const signature = await signer.signMessage(message)
+
+        console.log("✅ GenerateQR: Message signed")
 
         const signedPayload = {
             ...qrPayload,
@@ -34,6 +39,8 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
         }
 
         const qrDataString = JSON.stringify(signedPayload)
+
+        console.log("🎨 GenerateQR: Generating QR code image...")
 
         const qrCodeDataURL = await QRCode.toDataURL(qrDataString, {
             errorCorrectionLevel: 'H',
@@ -45,6 +52,8 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
             }
         })
 
+        console.log("✅ GenerateQR: QR code generated successfully")
+
         return {
             success: true,
             qrCodeImage: qrCodeDataURL,
@@ -52,10 +61,22 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
         }
         
     } catch (error) {
-        console.error("QR Generation failed:", error);
+        console.error("❌ GenerateQR failed:", error)
+        
+        // Better error messages
+        let errorMessage = "Failed to generate QR code"
+        
+        if (error.message.includes("user rejected")) {
+            errorMessage = "Signature request was rejected. Please approve the signature request."
+        } else if (error.message.includes("No wallet")) {
+            errorMessage = "No wallet connected. Please connect your wallet first."
+        } else if (error.message) {
+            errorMessage = error.message
+        }
+        
         return {
             success: false,
-            error: error.message || "Failed to generate QR code"
-        };
+            error: errorMessage
+        }
     }
 }

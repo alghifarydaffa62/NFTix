@@ -1,18 +1,18 @@
-import { BrowserProvider, Contract } from "ethers"
+// src/Utils/fetchUserTicket.js
+
+import { Contract } from "ethers"
 import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
 import TicketNFTABI from "../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import { getReadProvider } from "./getProvider"
 
 export default async function FetchUserTicket(userAddress) {
     try {
-        if (!window.ethereum) {
-            throw new Error("MetaMask not installed");
-        }
-
         if (!userAddress) {
             throw new Error("User address required");
         }
 
-        const provider = new BrowserProvider(window.ethereum);
+        const provider = await getReadProvider()
+
         const factoryAddress = import.meta.env.VITE_EVENTFACTORY;
 
         if (!factoryAddress) {
@@ -25,30 +25,32 @@ export default async function FetchUserTicket(userAddress) {
             provider
         );
 
-        const allEvents = await factory.getAllEvents();
-        console.log("Total events:", allEvents.length);
+        let allEvents
+        try {
+            allEvents = await factory.getAllEvents()
+        } catch (error) {
+            console.log("⚠️ Normal call failed, trying staticCall...")
+            allEvents = await factory.getAllEvents.staticCall()
+        }
 
         const userTickets = [];
 
         for (const event of allEvents) {
-            // Skip events without ticket contract
             if (event.ticketContract === "0x0000000000000000000000000000000000000000") {
+                console.log(`⏭️ Skipping ${event.name}: No ticket contract`)
                 continue;
             }
 
             try {
-                // Connect to TicketNFT contract
+
                 const ticketContract = new Contract(
                     event.ticketContract,
                     TicketNFTABI.abi,
                     provider
                 );
 
-                // Get user's balance for this event
                 const balance = await ticketContract.balanceOf(userAddress);
                 const balanceNumber = Number(balance);
-
-                console.log(`Event: ${event.name}, User balance: ${balanceNumber}`);
 
                 if (balanceNumber === 0) continue;
 
@@ -60,12 +62,10 @@ export default async function FetchUserTicket(userAddress) {
                         const ticketData = await ticketContract.tickets(tokenId);
 
                         let tokenURI = "";
-
                         try {
                             tokenURI = await ticketContract.tokenURI(tokenId);
                         } catch (err) {
-                            console.log("No tokenURI for token:", tokenIdStr);
-                            console.error("Error in fetching: ", err)
+                            console.log(`    ⚠️ No tokenURI for token ${tokenIdStr}`)
                         }
 
                         const ticket = {
@@ -82,8 +82,6 @@ export default async function FetchUserTicket(userAddress) {
                             
                             // Ticket info
                             tier: ticketData.tier,
-                            seatNumber: ticketData.seatNumber || "N/A",
-                            buyerName: ticketData.buyerName || "Anonymous",
                             originalPrice: ticketData.originalPrice,
                             purchaseTimestamp: ticketData.purchaseTimestamp,
                             
@@ -99,26 +97,24 @@ export default async function FetchUserTicket(userAddress) {
                         };
 
                         userTickets.push(ticket);
-                        console.log("Fetched ticket:", ticket);
 
                     } catch (tokenError) {
-                        console.error(`Error fetching token ${i}:`, tokenError);
+                        console.error(`    ❌ Error fetching token ${i}:`, tokenError);
                     }
                 }
 
             } catch (contractError) {
-                console.error(`Error with contract ${event.ticketContract}:`, contractError);
+                console.error(`❌ Error with contract ${event.ticketContract}:`, contractError);
             }
         }
-
-        console.log("Total tickets fetched:", userTickets.length);
 
         return {
             success: true,
             tickets: userTickets
         };
+
     } catch(err) {
-        console.error("FetchUserTickets failed:", err);
+        console.error("❌ FetchUserTicket failed:", err);
         return {
             success: false,
             error: err.message || "Failed to fetch tickets",

@@ -46,9 +46,20 @@ export default function BuyerEvents() {
 
     useEffect(() => {
         if (isConnected && address) {
-            loadTickets()
+            const timer = setTimeout(() => {
+                loadTickets()
+            })
+
+            return() => clearTimeout(timer)
         }
     }, [isConnected, address])
+
+    if(!isConnected) {
+        navigate('/connect')
+    }
+
+    console.log("Apakah connect ?", isConnected)
+    console.log("address: ", address)
 
     const loadTickets = async () => {
         setLoading(true)

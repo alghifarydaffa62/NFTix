@@ -70,14 +70,14 @@ export default function OrganizerEventCard({ event }) {
 
         <div className="flex flex-col sm:flex-row gap-2 mt-auto">
           <button
-            onClick={() => navigate(`/event/${event.id}`)}
-            className="w-full sm:w-1/2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
+            onClick={() => navigate(`/organizer/event/${event.id}`)}
+            className="cursor-pointer w-full sm:w-1/2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
           >
             View Details
           </button>
           <button
             onClick={() => navigate(`/organizer/scanner/${event.id}`)}
-            className="w-full sm:w-1/2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="cursor-pointer w-full sm:w-1/2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />

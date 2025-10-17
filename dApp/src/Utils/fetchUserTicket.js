@@ -1,5 +1,3 @@
-// src/Utils/fetchUserTicket.js
-
 import { Contract } from "ethers"
 import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
 import TicketNFTABI from "../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
@@ -29,7 +27,7 @@ export default async function FetchUserTicket(userAddress) {
         try {
             allEvents = await factory.getAllEvents()
         } catch (error) {
-            console.log("⚠️ Normal call failed, trying staticCall...")
+            console.log("⚠️ Normal call failed, trying staticCall...", error)
             allEvents = await factory.getAllEvents.staticCall()
         }
 
@@ -37,7 +35,6 @@ export default async function FetchUserTicket(userAddress) {
 
         for (const event of allEvents) {
             if (event.ticketContract === "0x0000000000000000000000000000000000000000") {
-                console.log(`⏭️ Skipping ${event.name}: No ticket contract`)
                 continue;
             }
 
@@ -65,7 +62,7 @@ export default async function FetchUserTicket(userAddress) {
                         try {
                             tokenURI = await ticketContract.tokenURI(tokenId);
                         } catch (err) {
-                            console.log(`    ⚠️ No tokenURI for token ${tokenIdStr}`)
+                            console.log(`Error fetching tokenURI for token ${tokenIdStr}`, err)
                         }
 
                         const ticket = {

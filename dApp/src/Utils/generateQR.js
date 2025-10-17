@@ -7,7 +7,6 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
     try {
         console.log("🔐 GenerateQR: Getting signer provider...")
 
-        // ✅ Use unified provider getter (handles AppKit, MetaMask, fallback)
         const { provider, signer } = await getSignerProvider()
 
         console.log("📝 GenerateQR: Creating QR payload...")

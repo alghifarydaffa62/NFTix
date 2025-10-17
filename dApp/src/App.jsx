@@ -10,6 +10,7 @@ import CreateEventPage from './Pages/Organizer.jsx/CreateEventPage'
 import OrganizerEvents from './Pages/Organizer.jsx/OrganizerEvents'
 import EventDetailPage from './Pages/Buyer/EventDetailPage'
 import EventScannerPage from './Pages/Organizer.jsx/EventScannerPage'
+import OrganizerEventDetailPage from './Pages/Organizer.jsx/OrganizerEventDetailPage'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path='/organizer/create' element={<CreateEventPage/>}/>
           <Route path='/organizer/MyEvents' element={<OrganizerEvents/>}/>
           <Route path='/organizer/scanner/:eventId' element={<EventScannerPage/>} />
+          <Route path='/organizer/event/:eventId' element={<OrganizerEventDetailPage/>}/>
           <Route path='/event/:eventId' element={<EventDetailPage/>}/>
         </Routes>
       </Router>

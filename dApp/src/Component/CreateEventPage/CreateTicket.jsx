@@ -70,7 +70,7 @@ export default function CreateTicket({ onTiersChange, disabled = false }) {
                     d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
                 />
                 </svg>
-                <h1 className="text-lg sm:text-xl font-bold text-gray-800">
+                <h1 className="text-lg sm:text-xl font-bold text-[hsla(179,64%,26%,1)]">
                     Ticket Tiers <span className="text-red-500">*</span>
                 </h1>
             </div>
@@ -102,7 +102,7 @@ export default function CreateTicket({ onTiersChange, disabled = false }) {
                             type="text"
                             value={tierName}
                             onChange={(e) => setTierName(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="e.g., VIP, Regular"
                             disabled={disabled}
                             required
@@ -121,7 +121,7 @@ export default function CreateTicket({ onTiersChange, disabled = false }) {
                             min="0.001"
                             value={tierPrice}
                             onChange={(e) => setTierPrice(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="e.g., 0.1"
                             disabled={disabled}
                             required
@@ -142,7 +142,7 @@ export default function CreateTicket({ onTiersChange, disabled = false }) {
                             min="1"
                             value={tierMaxSupply}
                             onChange={(e) => setTierMaxSupply(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="e.g., 100"
                             disabled={disabled}
                             required
@@ -213,7 +213,7 @@ export default function CreateTicket({ onTiersChange, disabled = false }) {
                             🎟 <strong>{tier.maxSupply}</strong> tickets
                             </span>
                             <span className="text-gray-500">
-                            Total: <strong>{(tier.price * tier.maxSupply).toFixed(3)}</strong> ETH
+                            Total: <strong>{(tier.price * tier.maxSupply)}</strong> ETH
                             </span>
                         </div>
                         </div>

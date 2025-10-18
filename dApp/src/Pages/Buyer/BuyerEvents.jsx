@@ -7,6 +7,7 @@ import GenerateQR from "../../Utils/generateQR"
 import QRModal from "../../Component/BuyerEventsPage/QRModal";
 import PageHeader from "../../Component/BuyerEventsPage/PageHeader";
 import TicketList from "../../Component/BuyerEventsPage/TicketList";
+import organizer from "../../assets/Organizer.png"
 
 const InitialLoader = () => (
     <div className="flex min-h-screen items-center justify-center">
@@ -29,6 +30,7 @@ export default function BuyerEvents() {
     const [selectedTicket, setSelectedTicket] = useState(null)
     const [showQRModal, setShowQRModal] = useState(false)
     const [generatingQR, setGeneratingQR] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -136,11 +138,36 @@ export default function BuyerEvents() {
 
     return(
         <div className="flex h-screen bg-gray-100">
-            <Sidebar/>
-            <main className="flex-1 p-8 overflow-y-scroll">
-                <PageHeader onRefresh={loadTickets} loading={loading}/>
-                <TicketList tickets={tickets} loading={loading} onShowQR={handleShowQR} generatingQR={generatingQR} selectedTicket={selectedTicket}/>
-                <QRModal showQRModal={showQRModal} selectedTicket={selectedTicket} setShowQRModal={setShowQRModal}/>
+            <button
+                className="lg:hidden fixed top-4 left-4 z-50 bg-[hsla(163,70%,34%,1)] text-white p-2 rounded-md shadow"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
+            ☰
+            </button>
+
+            {isSidebarOpen && (
+            <div
+                className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+                onClick={() => setIsSidebarOpen(false)}
+            ></div>
+            )}
+
+            <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen}/>
+
+            <main className="flex-1 overflow-y-scroll">
+                <div className="gap-3 bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))] flex items-center px-5 py-3 text-white">
+                    <div className="p-3 bg-[hsla(0,0%,100%,0.5)] rounded-full">
+                        <img src={organizer} alt="" className="w-6"/>
+                    </div>
+                
+                    <h1>Connected: <span className="text-blue-200">{address?.slice(0, 8)}...{address?.slice(-8)}</span></h1>
+                </div>
+
+                <div className="p-8">
+                    <PageHeader onRefresh={loadTickets} loading={loading}/>
+                    <TicketList tickets={tickets} loading={loading} onShowQR={handleShowQR} generatingQR={generatingQR} selectedTicket={selectedTicket}/>
+                    <QRModal showQRModal={showQRModal} selectedTicket={selectedTicket} setShowQRModal={setShowQRModal}/>
+                </div>
             </main>
         </div>
     )

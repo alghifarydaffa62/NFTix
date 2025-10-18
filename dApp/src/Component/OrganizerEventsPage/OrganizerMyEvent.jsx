@@ -79,10 +79,7 @@ export default function OrganizerMyEvent({userAddress}) {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-                        My Events
-                    </h1>
-                    <p className="text-gray-600 text-sm md:text-base">
+                    <p className="text-gray-900 text-sm md:text-base font-semibold">
                         {events.length} event{events.length !== 1 ? "s" : ""} total
                     </p>
                 </div>

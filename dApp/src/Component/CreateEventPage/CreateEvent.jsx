@@ -118,7 +118,7 @@ export default function CreateEvent({ tiers }) {
 
     return(
         <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">
+            <h1 className="text-2xl font-bold mb-6 text-[hsla(179,64%,26%,1)]">
                 Create New Event
             </h1>
 
@@ -168,7 +168,7 @@ export default function CreateEvent({ tiers }) {
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         placeholder="Enter event name"
                         disabled={loading}
                         required
@@ -184,7 +184,7 @@ export default function CreateEvent({ tiers }) {
                         id="desc"
                         value={desc}
                         onChange={(e) => setDesc(e.target.value)}
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         placeholder="Describe your event... (min 10 characters)"
                         rows="4"
                         disabled={loading}
@@ -205,7 +205,7 @@ export default function CreateEvent({ tiers }) {
                         id="image"
                         onChange={handleImageChange}
                         accept="image/*"
-                        className="border border-gray-300 rounded-md p-2"
+                        className="border border-[hsla(179,64%,26%,1)] rounded-md p-2"
                         disabled={loading}
                         required
                     />
@@ -232,7 +232,7 @@ export default function CreateEvent({ tiers }) {
                             id="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             disabled={loading}
                             required
                         />
@@ -248,7 +248,7 @@ export default function CreateEvent({ tiers }) {
                             id="deadline"
                             value={deadline}
                             onChange={(e) => setDeadline(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             disabled={loading}
                             required
                         />
@@ -267,7 +267,7 @@ export default function CreateEvent({ tiers }) {
                             id="venue"
                             value={venue}
                             onChange={(e) => setVenue(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="Enter event location"
                             disabled={loading}
                             required
@@ -284,7 +284,7 @@ export default function CreateEvent({ tiers }) {
                             id="maxParticipant"
                             value={maxParticipants}
                             onChange={(e) => setMaxParticipants(e.target.value)}
-                            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="border border-[hsla(179,64%,26%,1)] rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="e.g., 1000"
                             min="1"
                             disabled={loading}

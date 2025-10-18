@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../Component/Sidebar";
 import fetchBuyerHistory from "../../Utils/fetchBuyerHistory";
 import HistoryCard from "../../Component/HistoryCard";
+import organizer from "../../assets/Organizer.png"
 
 export default function BuyerHistory() {
     const { address, isConnected } = useAppKitAccount()
@@ -12,6 +13,7 @@ export default function BuyerHistory() {
     const [history, setHistory] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -71,11 +73,34 @@ export default function BuyerHistory() {
     }
     return(
         <div className="flex h-screen bg-gray-100">
-            <Sidebar/>
+            <button
+                className="lg:hidden fixed top-4 left-4 z-50 bg-[hsla(163,70%,34%,1)] text-white p-2 rounded-md shadow"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
+            ☰
+            </button>
 
-            <main className="flex-1 p-8 overflow-y-scroll">
+            {isSidebarOpen && (
+            <div
+                className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+                onClick={() => setIsSidebarOpen(false)}
+            ></div>
+            )}
+
+            <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen}/>
+
+            <main className="flex-1 overflow-y-scroll">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="gap-3 bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))] flex items-center px-5 py-3 text-white">
+                    <div className="p-3 bg-[hsla(0,0%,100%,0.5)] rounded-full">
+                        <img src={organizer} alt="" className="w-6"/>
+                    </div>
+                
+                    <h1>Connected: <span className="text-blue-200">{address?.slice(0, 8)}...{address?.slice(-8)}</span></h1>
+                </div>
+                
+                <div className="p-8">
+                    <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-4xl font-bold text-gray-900">Purchase History</h1>
                         <p className="text-gray-600 mt-2">All your ticket purchases in one place</p>
@@ -117,28 +142,30 @@ export default function BuyerHistory() {
                         </div>
                     </div>
                 ) : history.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                        <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Purchase History</h3>
-                        <p className="text-gray-500 mb-6">
-                            You haven't purchased any tickets yet.
-                        </p>
-                        <button
-                            onClick={() => navigate("/buyer")}
-                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
-                        >
-                            Browse Events
-                        </button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {history.map((item, index) => (
-                            <HistoryCard key={`${item.contractAddress}-${item.tokenId}`} item={item} />
-                        ))}
-                    </div>
-                )}
+                        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                            <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Purchase History</h3>
+                            <p className="text-gray-500 mb-6">
+                                You haven't purchased any tickets yet.
+                            </p>
+                            <button
+                                onClick={() => navigate("/buyer")}
+                                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+                            >
+                                Browse Events
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {history.map((item, index) => (
+                                <HistoryCard key={`${item.contractAddress}-${item.tokenId}`} item={item} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+                
             </main>
         </div>
     )

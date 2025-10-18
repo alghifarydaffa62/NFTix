@@ -4,6 +4,7 @@ import { useAppKitAccount} from "@reown/appkit/react"
 import SidebarOrganizer from "../Component/SidebarOrganizer";
 import fetchOrganizerStats from "../Utils/fetchOrganizerStats";
 import total from "../assets/total.png"
+import organizer from "../assets/Organizer.png"
 
 export default function OrganizerPage() {
     const { address, isConnected } = useAppKitAccount()
@@ -98,7 +99,7 @@ export default function OrganizerPage() {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-y-auto">
-                <div className="bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))] flex items-center justify-between p-4">
+                <div className="bg-[linear-gradient(to_right,hsla(160,46%,34%,1),hsla(183,70%,25%,1))] flex items-center gap-4 p-4 text-white">
                     <button
                         onClick={() => setSidebarOpen(!sidebarOpen)}
                         className="md:hidden text-white focus:outline-none"
@@ -108,9 +109,11 @@ export default function OrganizerPage() {
                         </svg>
                     </button>
 
-                    <h1 className="text-lg font-semibold text-white truncate">
-                        Organizer: {address?.slice(0, 6)}...{address?.slice(-4)}
-                    </h1>
+                    <div className="p-3 bg-[hsla(0,0%,100%,0.5)] rounded-full">
+                        <img src={organizer} alt="" className="w-6"/>
+                    </div>
+                
+                    <h1>Connected: <span className="text-blue-200">{address?.slice(0, 8)}...{address?.slice(-8)}</span></h1>
 
                     <div className="w-7 h-7 md:hidden"></div>
                 </div>

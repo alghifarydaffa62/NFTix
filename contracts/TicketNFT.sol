@@ -149,10 +149,21 @@ contract TicketNFT is ERC721Enumerable, Ownable, ReentrancyGuard {
     }
 
     function markAsUsed(uint256 tokenId) external onlyOwner {
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         Ticket storage ticket = tickets[tokenId];
         require(!ticket.used, "Ticket already used");
-        uint eventEnd = eventDate + 12 hours; 
-        require(block.timestamp >= eventDate && block.timestamp <= eventEnd, "Check-in window is not active");
+
+        uint checkInStart = eventDate - 4 hours;  
+        uint checkInEnd = eventDate + 4 hours; 
+        require(
+            block.timestamp >= checkInStart,
+            "Too early - Check-in not yet open"
+        );
+        
+        require(
+            block.timestamp <= checkInEnd,
+            "Too late - Check-in already closed"
+        );
         ticket.used = true;
         emit TicketUsed(tokenId, ownerOf(tokenId), block.timestamp);
     }

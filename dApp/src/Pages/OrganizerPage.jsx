@@ -211,7 +211,7 @@ export default function OrganizerPage() {
                                     </div>
                                 ) : (
                                     <p className="text-2xl font-bold mt-1">
-                                        {parseFloat(stats.totalRevenueETH).toFixed(4)} ETH
+                                        {parseFloat(stats.totalRevenueETH)} ETH
                                     </p>
                                 )}
                             </div>

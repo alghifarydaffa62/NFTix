@@ -5,11 +5,7 @@ import { getSignerProvider } from "./getProvider"
 
 export default async function GenerateQR({ tokenId, contractAddress, ownerAddress, eventId }) {
     try {
-        console.log("🔐 GenerateQR: Getting signer provider...")
-
         const { provider, signer } = await getSignerProvider()
-
-        console.log("📝 GenerateQR: Creating QR payload...")
 
         const qrPayload = {
             ticketId: tokenId,
@@ -26,11 +22,7 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
             timestamp: qrPayload.timestamp
         })
 
-        console.log("✍️ GenerateQR: Signing message...")
-
         const signature = await signer.signMessage(message)
-
-        console.log("✅ GenerateQR: Message signed")
 
         const signedPayload = {
             ...qrPayload,
@@ -38,8 +30,6 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
         }
 
         const qrDataString = JSON.stringify(signedPayload)
-
-        console.log("🎨 GenerateQR: Generating QR code image...")
 
         const qrCodeDataURL = await QRCode.toDataURL(qrDataString, {
             errorCorrectionLevel: 'H',
@@ -50,8 +40,6 @@ export default async function GenerateQR({ tokenId, contractAddress, ownerAddres
                 light: '#FFFFFF'
             }
         })
-
-        console.log("✅ GenerateQR: QR code generated successfully")
 
         return {
             success: true,

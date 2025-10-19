@@ -1,5 +1,5 @@
 
-export default function InvalidVerification({ verificationResult, setVerificationResult, setManualTokenId }) {
+export default function InvalidVerification({ verificationResult, onScanAgain }) {
     return(
         <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -20,10 +20,7 @@ export default function InvalidVerification({ verificationResult, setVerificatio
             </div>
 
             <button
-                onClick={() => {
-                    setVerificationResult(null)
-                    setManualTokenId("")
-                }}
+                onClick={onScanAgain}
                 className="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700"
             >
                 Try Again

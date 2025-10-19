@@ -26,6 +26,8 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
         setLoading(true)
 
         try {
+            console.log("🎫 Step 1: Buying tickets...")
+
             const result = await BuyTicket({
                 ticketContractAddress: event.ticketContract,
                 tierIndex: tier.tierIndex,
@@ -37,9 +39,13 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                 throw new Error(result.error || "Purchase failed")
             }
 
+            console.log("✅ Tickets purchased, TokenIDs:", result.tokenIds)
+
             setSuccess(true)
             setTxHash(result.transactionHash)
             setTokenIds(result.tokenIds)
+
+            console.log("🔐 Step 2: Generating QR codes...")
 
             const qrGenerationPromises = result.tokenIds.map(tokenId =>
                 GenerateQR({
@@ -51,7 +57,9 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             )
 
             const qrResults = await Promise.all(qrGenerationPromises)
+            console.log("✅ QR codes generated")
 
+            console.log("📤 Step 3: Uploading metadata to IPFS...")
             setUploadingMetadata(true)
 
             const { provider, signer } = await getSignerProvider()
@@ -79,11 +87,20 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
                         eventImageURI: event.imageURI
                     })
 
+                    console.log(`📝 Metadata for Token #${tokenId}:`, metadata)
+
                     const ipfsHash = await uploadMetadataToIpfs(metadata)
                     const tokenURI = `ipfs://${ipfsHash}`
+
+                    console.log(`✅ Token #${tokenId} metadata uploaded: ${tokenURI}`)
+
+                    // STEP 4: Set tokenURI on-chain
+                    console.log(`🔗 Setting tokenURI for Token #${tokenId}...`)
                     
                     const setURITx = await ticketContract.setTokenURI(tokenId, tokenURI)
                     await setURITx.wait()
+
+                    console.log(`✅ TokenURI set for Token #${tokenId}`)
 
                 } catch (metadataError) {
                     console.error(`❌ Error processing metadata for token ${i}:`, metadataError)
@@ -91,6 +108,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             }
 
             setUploadingMetadata(false)
+            console.log("✅ All metadata uploaded and set!")
 
             const existingTickets = JSON.parse(localStorage.getItem('myTickets') || '[]')
             

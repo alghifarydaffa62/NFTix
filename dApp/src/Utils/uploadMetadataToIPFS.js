@@ -2,7 +2,7 @@
 export async function uploadMetadataToIpfs(metadata) {
     try {
         const JWT = import.meta.env.VITE_PINATA_JWT
-
+        console.log("📤 Uploading metadata to IPFS via Pinata...")
         const response = await fetch(
             'https://api.pinata.cloud/pinning/pinJSONToIPFS', 
             {
@@ -22,6 +22,7 @@ export async function uploadMetadataToIpfs(metadata) {
 
         const data = await response.json()
         const ipfsHash = data.IpfsHash
+        console.log("✅ Metadata uploaded to IPFS:", ipfsHash)
 
         if (!ipfsHash) {
             throw new Error("No IPFS hash returned from Pinata")

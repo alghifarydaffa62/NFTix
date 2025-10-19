@@ -1,5 +1,5 @@
 
-export default function ValidVerification({ verificationResult, setVerificationResult, setManualTokenId }) {
+export default function ValidVerification({ verificationResult, onScanAgain }) {
     return(
         <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -30,16 +30,13 @@ export default function ValidVerification({ verificationResult, setVerificationR
                     </div>
                 )}
                 <div className="flex justify-between">
-                    <span className="text-gray-600">Name:</span>
-                    <span className="font-semibold text-gray-900">{verificationResult.buyerName}</span>
+                    <span className="text-gray-600">Wallet</span>
+                    <span className="font-semibold text-gray-900">{verificationResult.owner}</span>
                 </div>
             </div>
 
             <button
-                onClick={() => {
-                    setVerificationResult(null)
-                    setManualTokenId("")
-                }}
+                onClick={onScanAgain}
                 className="w-full mt-4 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700"
             >
                 Scan Next Ticket

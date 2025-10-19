@@ -24,9 +24,8 @@ export default function EventScannerPage() {
     const [verificationResult, setVerificationResult] = useState(null)
     const [scannedTickets, setScannedTickets] = useState([])
     const [useDeveloperMode, setUseDeveloperMode] = useState(false)
-    const [manualTokenId, setManualTokenId] = useState("")
 
-     useEffect(() => {
+    useEffect(() => {
         if (!isConnected) {
             navigate("/connect")
             return
@@ -35,7 +34,7 @@ export default function EventScannerPage() {
         fetchEventDetails()
     }, [eventId, isConnected])
 
-     const fetchEventDetails = async () => {
+    const fetchEventDetails = async () => {
         try {
             setLoading(true)
             
@@ -75,31 +74,24 @@ export default function EventScannerPage() {
     }
 
     const handleQRScanned = async (qrData) => {
-        setScanning(false)
-        await verifyTicket(qrData)
+        console.log("📋 QR Scanned, stopping scanner...")
+        setScanning(false) 
+
+        setTimeout(async () => {
+            await verifyTicket(qrData)
+        }, 300)
     }
 
-    const handleManualVerify = async () => {
-        if (!manualTokenId) {
-            alert("Please enter Token ID")
-            return
-        }
-
-        const mockQRData = {
-            ticketId: manualTokenId,
-            contractAddress: event.ticketContract,
-            ownerAddress: "0x0000000000000000000000000000000000000000", 
-            eventId: eventId
-        }
-
-        await verifyTicket(mockQRData)
+    const handleScanError = (error) => {
+        console.error("❌ Scanner error:", error)
+        alert(`Scanner error: ${error}\n\nPlease try again or use Developer Mode.`)
+        setScanning(false)
     }
 
     const verifyTicket = async (qrData) => {
         setVerificationResult({ status: "verifying" })
 
         try {
-
             let ticketData
             if (typeof qrData === 'string') {
                 ticketData = JSON.parse(qrData)
@@ -107,7 +99,7 @@ export default function EventScannerPage() {
                 ticketData = qrData
             }
 
-            console.log("Verifying ticket:", ticketData)
+            console.log("🔍 Verifying ticket:", ticketData)
 
             if (!ticketData.ticketId || !ticketData.contractAddress) {
                 throw new Error("Invalid QR code format")
@@ -123,11 +115,11 @@ export default function EventScannerPage() {
             )
 
             let ticketInfo
-
             try {
                 ticketInfo = await ticketContract.tickets(ticketData.ticketId)
             } catch (error) {
-                console.error("Error verifying the ticket: ", error)
+                console.error("Error fetching ticket: ", error)
+                throw new Error("Ticket does not exist")
             }
 
             const currentOwner = await ticketContract.ownerOf(ticketData.ticketId)
@@ -146,6 +138,7 @@ export default function EventScannerPage() {
                 throw new Error("Ticket is for a different event")
             }
 
+            console.log("✅ Ticket valid, marking as used...")
             const tx = await ticketContract.markAsUsed(ticketData.ticketId)
             await tx.wait()
 
@@ -161,9 +154,10 @@ export default function EventScannerPage() {
 
             setVerificationResult(result)
             setScannedTickets(prev => [result, ...prev])
+            console.log("✅ Verification complete!")
 
         } catch (error) {
-            console.error("Verification failed:", error)
+            console.error("❌ Verification failed:", error)
             
             setVerificationResult({
                 status: "invalid",
@@ -172,10 +166,13 @@ export default function EventScannerPage() {
         }
     }
 
+    const handleScanAgain = () => {
+        setVerificationResult(null)
+        setScanning(true) 
+    }
+
     if (loading) {
-        return (
-            <Loading type="scanner"/>
-        )
+        return <Loading type="scanner"/>
     }
 
     return(
@@ -193,31 +190,28 @@ export default function EventScannerPage() {
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Scan Ticket</h2>
 
-                        {useDeveloperMode ? (
-                            /* Developer Mode: Manual Input */
-                            <DeveloperMode 
-                                manualTokenId={manualTokenId} 
-                                setManualTokenId={setManualTokenId} 
-                                handleManualVerify={handleManualVerify}
-                            />
-                        ) : (
-                            /* QR Scanner Mode */
-                            scanning ? (
-                                <QRScanner
-                                    onScan={handleQRScanned}
-                                    onError={(err) => {
-                                        console.error("QR Scan error:", err)
-                                        alert("Failed to scan QR code: " + err)
-                                        setScanning(false)
-                                    }}
-                                    scanning={scanning}
-                                />
+                        {   scanning ? (
+                                <div key={Date.now()}> {/* ✅ Force remount with unique key */}
+                                    <QRScanner
+                                        onScan={handleQRScanned}
+                                        onError={handleScanError}
+                                    />
+                                    
+                                    {/* ✅ Cancel button */}
+                                    <button
+                                        onClick={() => {
+                                            console.log("🛑 User cancelled scan")
+                                            setScanning(false)
+                                        }}
+                                        className="w-full mt-4 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition"
+                                    >
+                                        Cancel Scanning
+                                    </button>
+                                </div>
                             ) : (
                                 <StartScanner setScanning={setScanning}/>
-                            )
-                        )}
+                            )}
 
-                        {/* Verification Result */}
                         {verificationResult && (
                             <div className="mt-6">
                                 {verificationResult.status === "verifying" && (
@@ -233,16 +227,16 @@ export default function EventScannerPage() {
                                 {verificationResult.status === "valid" && (
                                     <ValidVerification 
                                         verificationResult={verificationResult} 
-                                        setManualTokenId={setManualTokenId} 
                                         setVerificationResult={setVerificationResult}
+                                        onScanAgain={handleScanAgain}
                                     />
                                 )}
 
                                 {verificationResult.status === "invalid" && (
                                     <InvalidVerification
                                         verificationResult={verificationResult} 
-                                        setManualTokenId={setManualTokenId} 
                                         setVerificationResult={setVerificationResult}
+                                        onScanAgain={handleScanAgain}
                                     />  
                                 )}
                             </div>

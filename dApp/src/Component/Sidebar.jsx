@@ -59,7 +59,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                     onClick={() => setIsOpen(false)}
                 >
                     <img src={active} alt="" className="w-5"/>
-                    Active Events
+                    Active Tickets
                 </a>
             </li>
             <li>

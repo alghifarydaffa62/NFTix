@@ -10,10 +10,7 @@ export default function ScannedTickets({ scannedTickets }) {
                     </div>
                     <div className="text-sm space-y-1">
                         <p className="text-gray-700"><span className="font-semibold">Tier:</span> {ticket.tier}</p>
-                        <p className="text-gray-700"><span className="font-semibold">Name:</span> {ticket.buyerName}</p>
-                        {ticket.seatNumber !== "N/A" && (
-                            <p className="text-gray-700"><span className="font-semibold">Seat:</span> {ticket.seatNumber}</p>
-                        )}
+                        <p className="text-gray-700"><span className="font-semibold">wallet:</span> {ticket.owner.slice(0, 20)}...</p>
                     </div>
                 </div>
             ))}

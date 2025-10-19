@@ -31,7 +31,7 @@ export default function ValidVerification({ verificationResult, onScanAgain }) {
                 )}
                 <div className="flex justify-between">
                     <span className="text-gray-600">Wallet</span>
-                    <span className="font-semibold text-gray-900">{verificationResult.owner}</span>
+                    <span className="font-semibold text-gray-900">{verificationResult.owner.slice(0, 20)}...</span>
                 </div>
             </div>
 

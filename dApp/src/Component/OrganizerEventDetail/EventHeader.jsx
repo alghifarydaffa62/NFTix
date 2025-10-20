@@ -18,7 +18,6 @@ export default function EventHeader({ event }) {
 
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                    {/* Gambar Event */}
                     <div className="h-80 bg-gradient-to-br from-blue-600 to-indigo-600 relative">
                     {event.imageURI ? (
                         <img
@@ -45,7 +44,6 @@ export default function EventHeader({ event }) {
                     )}
                     </div>
 
-                    {/* Judul & Deskripsi Event */}
                     <div className="p-6">
                         <h1 className="text-2xl lg:text-4xl font-bold text-gray-900 mb-2">
                             {event.name}

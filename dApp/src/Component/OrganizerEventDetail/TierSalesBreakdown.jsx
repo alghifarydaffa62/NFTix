@@ -13,7 +13,6 @@ export default function TierSalesBreakdown({ tierBreakdown }) {
 
                     return (
                         <div key={index} className="border border-gray-200 rounded-lg p-4">
-                            {/* Tier Header */}
                             <div className="flex justify-between items-start mb-3">
                                 <div>
                                     <h3 className="text-lg font-bold text-gray-900">{tier.name}</h3>
@@ -44,7 +43,7 @@ export default function TierSalesBreakdown({ tierBreakdown }) {
                             <div className="flex justify-between items-center pt-3 border-t border-gray-200">
                                 <span className="text-sm font-medium text-gray-600">Revenue from this tier:</span>
                                 <span className="text-lg font-bold text-green-600">
-                                    {parseFloat(tier.revenueETH).toFixed(4)} ETH
+                                    {parseFloat(tier.revenueETH)} ETH
                                 </span>
                             </div>
 

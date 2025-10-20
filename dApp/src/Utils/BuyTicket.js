@@ -29,8 +29,6 @@ export default async function BuyTicket({ ticketContractAddress, tierIndex, quan
 
         const totalPriceInWei = pricePerTicketBigInt * quantityBigInt;
 
-        console.log(`Attempting to buy ${quantity} ticket(s) for ${totalPriceInWei.toString()} Wei`);
-
         const tx = await ticketContract.buyTicket(
             tierIndex,
             quantity,

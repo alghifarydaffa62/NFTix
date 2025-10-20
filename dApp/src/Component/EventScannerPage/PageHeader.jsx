@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-export default function PageHeader({ event, setUseDeveloperMode, useDeveloperMode }) {
+export default function PageHeader({ event }) {
     const navigate = useNavigate()
 
     return(
@@ -17,18 +17,6 @@ export default function PageHeader({ event, setUseDeveloperMode, useDeveloperMod
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Ticket Scanner</h1>
             <p className="text-gray-600">Event: {event.name}</p>
             <p className="text-sm text-gray-500">Venue: {event.venue}</p>
-
-            <div className="mt-4 flex items-center gap-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={useDeveloperMode}
-                        onChange={(e) => setUseDeveloperMode(e.target.checked)}
-                        className="w-5 h-5"
-                    />
-                    <span className="text-sm text-gray-700">Developer Mode (Manual Input)</span>
-                </label>
-            </div>
         </div>
     )
 }

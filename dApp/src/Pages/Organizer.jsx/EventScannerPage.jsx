@@ -6,7 +6,6 @@ import QRScanner from "../../Component/EventScannerPage/QRScanner";
 import EventFactoryABI from "../../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
 import TicketNFTABI from "../../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
 import PageHeader from "../../Component/EventScannerPage/PageHeader";
-import DeveloperMode from "../../Component/EventScannerPage/DeveloperMode";
 import StartScanner from "../../Component/EventScannerPage/StartScanner";
 import ValidVerification from "../../Component/EventScannerPage/ValidVerification";
 import InvalidVerification from "../../Component/EventScannerPage/InvalidVerification";
@@ -23,7 +22,6 @@ export default function EventScannerPage() {
     const [scanning, setScanning] = useState(false)
     const [verificationResult, setVerificationResult] = useState(null)
     const [scannedTickets, setScannedTickets] = useState([])
-    const [useDeveloperMode, setUseDeveloperMode] = useState(false)
 
     useEffect(() => {
         if (!isConnected) {
@@ -99,7 +97,6 @@ export default function EventScannerPage() {
                 ticketData = qrData
             }
 
-            console.log("🔍 Verifying ticket:", ticketData)
 
             if (!ticketData.ticketId || !ticketData.contractAddress) {
                 throw new Error("Invalid QR code format")
@@ -126,7 +123,7 @@ export default function EventScannerPage() {
 
             if (ticketData.ownerAddress && ticketData.ownerAddress !== "0x0000000000000000000000000000000000000000") {
                 if (currentOwner.toLowerCase() !== ticketData.ownerAddress.toLowerCase()) {
-                    throw new Error("Owner mismatch - Ticket may have been transferred")
+                    throw new Error("Owner mismatch")
                 }
             }
 
@@ -138,30 +135,51 @@ export default function EventScannerPage() {
                 throw new Error("Ticket is for a different event")
             }
 
-            console.log("✅ Ticket valid, marking as used...")
-            const tx = await ticketContract.markAsUsed(ticketData.ticketId)
-            await tx.wait()
+            try {
+                const tx = await ticketContract.markAsUsed(ticketData.ticketId)
+                await tx.wait()
+            } catch (markError) {
+                console.error("❌ markAsUsed failed:", markError)
+
+                let errorReason = "Failed to mark ticket as used"
+                
+                if (markError.message.includes("Too early")) {
+                    errorReason = "Check-in Too Early"
+                } else if (markError.message.includes("Too late")) {
+                    errorReason = "Check-in Too Late"
+                } else if (markError.message.includes("already used")) {
+                    errorReason = "Ticket Already Used"
+                } else if (markError.reason) {
+                    errorReason = markError.reason
+                } else if (markError.message) {
+                    errorReason = markError.message
+                }
+                
+                throw new Error(errorReason)
+            }
 
             const result = {
                 status: "valid",
                 tokenId: ticketData.ticketId,
                 tier: ticketInfo.tier,
-                seatNumber: ticketInfo.seatNumber || "N/A",
-                buyerName: ticketInfo.buyerName || "Anonymous",
                 owner: currentOwner,
                 timestamp: new Date().toLocaleString()
             }
 
             setVerificationResult(result)
             setScannedTickets(prev => [result, ...prev])
-            console.log("✅ Verification complete!")
-
         } catch (error) {
             console.error("❌ Verification failed:", error)
-            
+
+            let displayReason = error.message || "Verification failed"
+
+            if (displayReason.includes("execution reverted:")) {
+                displayReason = displayReason.split("execution reverted:")[1].trim()
+            }
+
             setVerificationResult({
                 status: "invalid",
-                reason: error.message || "Verification failed"
+                reason: displayReason
             })
         }
     }
@@ -181,8 +199,6 @@ export default function EventScannerPage() {
                 
                 <PageHeader 
                     event={event} 
-                    useDeveloperMode={useDeveloperMode} 
-                    setUseDeveloperMode={setUseDeveloperMode}
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -191,13 +207,12 @@ export default function EventScannerPage() {
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Scan Ticket</h2>
 
                         {   scanning ? (
-                                <div key={Date.now()}> {/* ✅ Force remount with unique key */}
+                                <div key={Date.now()}>
                                     <QRScanner
                                         onScan={handleQRScanned}
                                         onError={handleScanError}
                                     />
-                                    
-                                    {/* ✅ Cancel button */}
+
                                     <button
                                         onClick={() => {
                                             console.log("🛑 User cancelled scan")

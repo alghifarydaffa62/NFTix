@@ -78,7 +78,7 @@ export default function EventStats({ stats, loading, error, onRefresh }) {
                         <div className="flex-1">
                             <p className="text-sm text-gray-600 font-medium">Total Revenue</p>
                             <p className="text-3xl font-bold text-gray-900">
-                                {parseFloat(stats.totalRevenueETH).toFixed(4)} ETH
+                                {parseFloat(stats.totalRevenueETH)} ETH
                             </p>
                         </div>
                     </div>

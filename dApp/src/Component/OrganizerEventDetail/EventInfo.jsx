@@ -1,5 +1,3 @@
-// src/Component/OrganizerEventDetail/EventInfo.jsx
-
 export default function EventInfo({ event }) {
     const formatDate = (timestamp) => {
         const date = new Date(Number(timestamp) * 1000)

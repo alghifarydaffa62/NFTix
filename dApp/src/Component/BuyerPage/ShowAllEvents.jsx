@@ -3,7 +3,7 @@ import fetchAllEvents from "../../Utils/fetchAllEvents"
 import EventCard from "../EventCard"
 
 export default function ShowAllEvents() {
-    const [allEvents, setAllEvents] = useState([]) // All events from blockchain
+    const [allEvents, setAllEvents] = useState([]) 
     const [activeEvents, setActiveEvents] = useState([])
     const [pastEvents, setPastEvents] = useState([])
     const [loading, setLoading] = useState(true)
@@ -113,7 +113,7 @@ export default function ShowAllEvents() {
     if (activeEvents.length === 0) {
         return (
             <div>
-                {/* No Active Events Notice */}
+
                 <div className="max-w-2xl mx-auto mb-8">
                     <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
                         <svg className="w-20 h-20 mx-auto text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,6 @@ export default function ShowAllEvents() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-75">
                                 {pastEvents.map((event) => (
                                     <div key={event.id} className="relative">
-                                        {/* Past Event Badge */}
                                         <div className="absolute top-4 right-4 z-10 bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-semibold">
                                             Ended
                                         </div>

@@ -1,7 +1,7 @@
 import { Contract, formatEther } from "ethers"
 import { getReadProvider } from "./getProvider"
-import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
-import TicketNFTABI from "../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import EventFactoryABI from "../abi/EventFactory.json"
+import TicketNFTABI from "../abi/TicketNFT.json"
 
 export default async function fetchEventStats(eventId) {
     try {

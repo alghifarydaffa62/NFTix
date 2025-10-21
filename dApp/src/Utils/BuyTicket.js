@@ -1,5 +1,5 @@
 import { BrowserProvider, Contract } from "ethers"
-import TicketNFTABI from "../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import TicketNFTABI from "../abi/TicketNFT.json"
 
 export default async function BuyTicket({ ticketContractAddress, tierIndex, quantity, priceInWei }) {
     try {

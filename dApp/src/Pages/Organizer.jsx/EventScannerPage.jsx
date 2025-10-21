@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { BrowserProvider, Contract } from "ethers";
 import QRScanner from "../../Component/EventScannerPage/QRScanner";
-import EventFactoryABI from "../../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
-import TicketNFTABI from "../../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import EventFactoryABI from "../../abi/EventFactory.json"
+import TicketNFTABI from "../../abi/TicketNFT.json"
 import PageHeader from "../../Component/EventScannerPage/PageHeader";
 import StartScanner from "../../Component/EventScannerPage/StartScanner";
 import ValidVerification from "../../Component/EventScannerPage/ValidVerification";

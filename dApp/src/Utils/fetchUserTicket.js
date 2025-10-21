@@ -1,6 +1,6 @@
 import { Contract } from "ethers"
-import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
-import TicketNFTABI from "../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import EventFactoryABI from "../abi/EventFactory.json"
+import TicketNFTABI from "../abi/TicketNFT.json"
 import { getReadProvider } from "./getProvider"
 
 export default async function FetchUserTicket(userAddress) {

@@ -1,5 +1,3 @@
-// src/Utils/generateQR.js
-
 import QRCode from "qrcode"
 import { getSignerProvider } from "./getProvider"
 

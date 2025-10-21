@@ -1,5 +1,5 @@
-import EventFactoryABI from "../../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
-import TicketNFTABI from "../../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import EventFactoryABI from "../../abi/EventFactory.json"
+import TicketNFTABI from "../../abi/TicketNFT.json"
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Contract, BrowserProvider, formatEther } from "ethers"

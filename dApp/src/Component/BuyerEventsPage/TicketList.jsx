@@ -1,4 +1,3 @@
-// src/Component/TicketList.js
 import TicketBox from './TicketBox';
 import { useNavigate } from 'react-router-dom';
 

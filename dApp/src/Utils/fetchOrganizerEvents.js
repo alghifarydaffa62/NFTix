@@ -1,4 +1,4 @@
-import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
+import EventFactoryABI from "../abi/EventFactory.json"
 import { Contract, ethers } from "ethers"
 
 export default async function fetchOrganizerEvents(userAddress) {

@@ -1,6 +1,5 @@
 import { useState } from "react"
 import CreateNewEvent from "../../Utils/CreateNewEvent"
-import CreateTicket from "./CreateTicket"
 
 export default function CreateEvent({ tiers }) {
     const [name, setName] = useState("")

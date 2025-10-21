@@ -1,5 +1,5 @@
 import { BrowserProvider, Contract, parseEther } from "ethers"
-import EventFactoryABI from "../../../artifacts/contracts/EventFactory.sol/EventFactory.json"
+import EventFactoryABI from "../abi/EventFactory.json"
 import uploadToIPFS from "./uploadToIPFS"
 
 function dateToTimestamp(dateString) {

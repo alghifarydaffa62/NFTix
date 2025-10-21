@@ -1,5 +1,3 @@
-// src/Component/OrganizerEventDetail/EventStats.jsx
-
 export default function EventStats({ stats, loading, error, onRefresh }) {
     if (loading) {
         return (

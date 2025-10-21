@@ -5,7 +5,7 @@ import { generateTicketMetadata, uploadMetadataToIpfs } from "../../Utils/upload
 import BuyTicket from "../../Utils/BuyTicket"
 import GenerateQR from "../../Utils/generateQR"
 import { getSignerProvider } from "../../Utils/getProvider"
-import TicketNFTABI from "../../../../artifacts/contracts/TicketNFT.sol/TicketNFT.json"
+import TicketNFTABI from "../../abi/TicketNFT.json"
 
 export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
     const { address } = useAppKitAccount()
@@ -62,7 +62,7 @@ export default function BuyTicketModal({ event, tier, onClose, onSuccess }) {
             console.log("📤 Step 3: Uploading metadata to IPFS...")
             setUploadingMetadata(true)
 
-            const { provider, signer } = await getSignerProvider()
+            const { signer } = await getSignerProvider()
             const ticketContract = new Contract(
                 event.ticketContract,
                 TicketNFTABI.abi,
